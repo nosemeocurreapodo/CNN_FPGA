@@ -38,9 +38,10 @@ class conv_buffer
 
 	void reset()
 	{
-	conv_buffer_reset_y_loop:
+	    conv_buffer_reset_y_loop:
 		for (int y = 0; y < MAX_KERNEL_SIZE; y++)
 		{
+            conv_buffer_reset_x_loop:
             for(int x = 0; x < MAX_WIDTH; x++)
             {
 //#pragma HLS unroll
@@ -228,7 +229,9 @@ int convolution(hls::stream<packet> &input, hls::stream<packet> &output, int &in
 
     conv_buffer<data_type> in_buffer;
 #pragma HLS ARRAY_PARTITION variable=in_buffer.data dim=1 type=complete
-#pragma HLS ARRAY_PARTITION variable=in_buffer.data dim=2 type=cyclic
+//#pragma HLS ARRAY_PARTITION variable=in_buffer.data dim=2 type=cyclic factor=2
+#pragma HLS ARRAY_PARTITION variable=in_buffer.data dim=2 type=complete
+
 //#pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
     kernel_buffer<data_type> i_kernel;
 #pragma HLS ARRAY_PARTITION variable=i_kernel.data dim=0 type=complete
