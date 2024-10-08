@@ -67,12 +67,12 @@ class conv_buffer
         shift_reg_y_loop:
         for(int y = 0; y < MAX_KERNEL_SIZE; y++)
         {
-//#pragma HLS unroll
+#pragma HLS unroll
 
             shift_reg_x_loop:
             for (int x = 0; x < MAX_WIDTH-1; x++)
             {
-//#pragma HLS unroll
+#pragma HLS unroll
 
                 data[y][x] = data[y][x + 1];
             }
@@ -227,6 +227,7 @@ int convolution(hls::stream<packet> &input, hls::stream<packet> &output, int &in
 #pragma HLS INTERFACE s_axilite port = return
 
     conv_buffer<data_type> in_buffer;
+#pragma HLS ARRAY_PARTITION variable=in_buffer.data dim=1 type=complete
 #pragma HLS ARRAY_PARTITION variable=in_buffer.data dim=2 type=cyclic
 //#pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
     kernel_buffer<data_type> i_kernel;
