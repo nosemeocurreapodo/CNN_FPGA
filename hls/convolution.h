@@ -6,9 +6,7 @@
 #include "hls_stream.h"
 #include "data_types.h"
 
-#define MAX_KERNEL_SIZE 5
+#define MAX_KERNEL_SIZE 7
 #define MAX_WIDTH 1024
-
-#define CONV_BUFFER_SIZE 10
 
 extern int convolution(hls::stream<packet> &input, hls::stream<packet> &output, int &in_width, float kernel[MAX_KERNEL_SIZE*MAX_KERNEL_SIZE], int &kernel_size); 
