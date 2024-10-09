@@ -53,8 +53,8 @@ int main(void)
     kernel[8] = -1.0;
 */
 
-//    kernel[4] = 1.0;
-
+    kernel[4] = 1.0;
+/*
     kernel[0] = 1.0/9.0;
     kernel[1] = 1.0/9.0;
     kernel[2] = 1.0/9.0;
@@ -66,7 +66,7 @@ int main(void)
     kernel[6] = 1.0/9.0;
     kernel[7] = 1.0/9.0;
     kernel[8] = 1.0/9.0;
-
+*/
     convolution(s_in, s_out, width, kernel, kernel_size); 
 
     for (int y = 0; y < height; y++)

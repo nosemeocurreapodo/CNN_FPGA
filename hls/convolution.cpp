@@ -454,7 +454,7 @@ type dot_3(ap_shift_reg<type, MAX_WIDTH*MAX_KERNEL_SIZE> &data, kernel_buffer<ty
         for(int x =0; x < MAX_KERNEL_SIZE; x++)
         {
 #pragma HLS unroll
-            mul[y][x] = data.read(x + y*in_width)*a.data[y][x];
+            mul[y][x] = data.read(in_width - 1 - x + (MAX_KERNEL_SIZE - 1 - y)*in_width)*a.data[MAX_KERNEL_SIZE - 1 - y][MAX_KERNEL_SIZE - 1 - x];
         }
     }
 
@@ -489,7 +489,7 @@ type dot_5(ap_shift_reg<type, MAX_WIDTH*MAX_KERNEL_SIZE> &data, kernel_buffer<ty
         for(int x =0; x < MAX_KERNEL_SIZE; x++)
         {
 #pragma HLS unroll
-            mul[y][x] = data.read(x + y*in_width)*a.data[y][x];
+            mul[y][x] = data.read(in_width - 1 - x + (MAX_KERNEL_SIZE - 1 - y)*in_width)*a.data[MAX_KERNEL_SIZE - 1 - y][MAX_KERNEL_SIZE - 1 - x];
         }
     }
 
@@ -543,7 +543,7 @@ type dot_7(ap_shift_reg<type, MAX_WIDTH*MAX_KERNEL_SIZE> &data, kernel_buffer<ty
         for(int x =0; x < MAX_KERNEL_SIZE; x++)
         {
 #pragma HLS unroll
-            mul[y][x] = data.read(MAX_WIDTH - x + (MAX_KERNEL_SIZE - y)*in_width)*a.data[MAX_KERNEL_SIZE - 1 - y][MAX_KERNEL_SIZE - 1 - x];
+            mul[y][x] = data.read(in_width - 1 - x + (MAX_KERNEL_SIZE - 1 - y)*in_width)*a.data[MAX_KERNEL_SIZE - 1 - y][MAX_KERNEL_SIZE - 1 - x];
         }
     }
 
@@ -672,14 +672,14 @@ int convolution(hls::stream<packet> &input, hls::stream<packet> &output, int &in
             padding_data_counter++;
         }
 
-        if(data_counter < MAX_WIDTH*(kernel_size-1)/2)
-            continue;
-
-        if(padding_data_counter > MAX_WIDTH*(kernel_size-1)/2)
-            break;
-
         //in_buffer.shift_down(in_data, in_width, kernel_size);
         in_buffer.shift(in_data, 1);
+
+        if(data_counter <= in_width*int((kernel_size-1)/2+1)-(kernel_size-1)/2)
+            continue;
+
+        if(padding_data_counter > in_width*int((kernel_size-1)/2+1)-(kernel_size-1)/2)
+            break;
 
 #if(MAX_KERNEL_SIZE == 3)
         //data_type conv = in_buffer.dot_3(i_kernel, in_width);
