@@ -3,6 +3,7 @@
 #include "ap_axi_sdata.h"
 //#include "ap_int.h"
 #include "ap_fixed.h"
+#include "ap_shift_reg.h"
 #include "hls_stream.h"
 #include "data_types.h"
 
