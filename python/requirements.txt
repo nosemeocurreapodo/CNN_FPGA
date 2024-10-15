@@ -1,2 +1,10 @@
 numpy==1.23.2
+scipy==1.8
+cython==3.0.10
+meson-python==0.16.0
+pythran
+pybind11
+scikit-learn==1.4.0
 tflite-runtime==2.14.0
+
+#sudo apt-get install python3-sklearn python3-sklearn-lib python3-sklearn-doc
