@@ -49,16 +49,19 @@ struct floatX
             int quo = hls::pow(2, exp);
             float man = abs_fp / quo;    
 
+            exp = exp + hls::pow(2, exponent_size - 1) - 1;
+            man = man*hls::pow(2, mantissa_size);
+
             sign = s;
-            exponent = hls::pow(2, (exponent_size - 1)) - 1 + exp;
-            mantissa = man*hls::pow(2, mantissa_size); 
+            exponent = exp;
+            mantissa = man; 
         }
     }
 
     float to_float()
     {
         float result;
-        if(exponent == 0 && mantissa == 0)
+        if(mantissa == 0)
         {
             result = 0.0;
         }
@@ -68,7 +71,7 @@ struct floatX
             un_mantissa[mantissa_size] = 1; //leading bit
             un_mantissa[mantissa_size+1] = 0; //leave space for sign
 
-            float un_exponent = float(exponent) - hls::pow(2, exponent_size - 1) - 1;
+            float un_exponent = float(exponent) - (hls::pow(2, exponent_size - 1) - 1);
 
             result = float(un_mantissa)*hls::pow(float(2.0), un_exponent);
             if(sign < 0)
@@ -133,20 +136,41 @@ struct floatX
         floatX result;
         
         ap_int<mantissa_size+1> unnorm_mantissa_1 = mantissa;
-        unnorm_mantissa_1[mantissa_size] = 1; //leading bit
+        if(exponent != 0)
+            unnorm_mantissa_1[mantissa_size] = 1; //leading bit
+        else
+            unnorm_mantissa_1[mantissa_size] = 0; //leading bit
+
+        ap_int<exponent_size> unnorm_exponent_1 = exponent - hls::pow(2, exponent_size - 1) + 1;
         
         ap_int<mantissa_size+1> unnorm_mantissa_2 = c.mantissa;
-        unnorm_mantissa_2[mantissa_size] = 1; //leading bit
+        if(c.exponent != 0)
+            unnorm_mantissa_2[mantissa_size] = 1; //leading bit
+        else
+            unnorm_mantissa_2[mantissa_size] = 0; //leading bit
+
+        ap_int<exponent_size> unnorm_exponent_2 = c.exponent - (hls::pow(2, exponent_size - 1) - 1);
 
         ap_int<(mantissa_size+1)*2> res_mantissa = unnorm_mantissa_1*unnorm_mantissa_2;
+        ap_int<exponent_size+1> res_exponent = unnorm_exponent_1 + unnorm_exponent_2;
 
-        int leading_zeros = count_leading_zeros<(mantissa_size+1)*2>(res_mantissa);
+        int leading_zeros = count_leading_zeros<(mantissa_size+1)*2>(res_mantissa) - 1;
 
         res_mantissa = res_mantissa << leading_zeros;
+        res_exponent = res_exponent + leading_zeros;
 
-        result.sign = sign ^ c.sign;
-        result.mantissa = res_mantissa(1, mantissa_size);
-        result.exponent = exponent + c.exponent + leading_zeros;
+        if(res_mantissa != 0)
+        {
+            result.sign = sign ^ c.sign;
+            result.mantissa = res_mantissa(1, mantissa_size);
+            result.exponent = res_exponent + hls::pow(2, exponent_size - 1) - 1;
+        }
+        else
+        {
+            result.sign = 0;
+            result.mantissa = 0;
+            result.exponent = 0;
+        }
 
         return result;
     }
