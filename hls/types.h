@@ -2,6 +2,7 @@
 
 #include "hls_math.h"
 
+
 template <typename type>
 struct vec2
 {
