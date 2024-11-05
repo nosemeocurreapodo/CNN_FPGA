@@ -4,12 +4,11 @@
 #include "ap_int.h"
 #include "ap_fixed.h"
 
-template <int size>
-int count_leading_zeros(ap_int<size> mantissa)
+template <typename type>
+int count_leading_zeros(type mantissa)
 {
-    //count leading zeros
     int leading_zeros = 0;
-    for(int i = size-1; i >= 0; i--)
+    for(int i = mantissa.width-1; i >= 0; i--)
     {
         if(mantissa[i] == 0)
             leading_zeros++;
@@ -30,10 +29,6 @@ struct floatX
     floatX(float c)
     {
         float fp = c;
-
-        bool s = 0;
-        if(fp < 0.0)
-            s = 1;
         
         float abs_fp = abs(fp);
 
@@ -45,36 +40,42 @@ struct floatX
         }
         else
         {
-            int exp = int(hls::log2(abs_fp));
-            int quo = hls::pow(2, exp);
+            bool s = 0;
+            if(fp < 0.0)
+                s = 1;
+
+            float exp = floor(hls::log2(abs_fp));
+            float quo = hls::pow(2.0f, exp);
             float man = abs_fp / quo;    
 
-            exp = exp + hls::pow(2, exponent_size - 1) - 1;
-            man = man*hls::pow(2, mantissa_size);
+            int exp_ = exp + hls::pow(2, exponent_size - 1) - 1;
+            int man_ = man * hls::pow(2, mantissa_size);
+
+            ap_uint<exponent_size> exp__ = exp_;
+            ap_uint<mantissa_size> man__ = man_;
 
             sign = s;
-            exponent = exp;
-            mantissa = man; 
+            exponent = exp__;
+            mantissa = man__; 
         }
     }
 
     float to_float()
     {
         float result;
-        if(mantissa == 0)
+        if(exponent == 0)
         {
             result = 0.0;
         }
         else 
         { 
-            ap_int<mantissa_size+2> un_mantissa = mantissa;
+            ap_uint<mantissa_size+1> un_mantissa = mantissa;
             un_mantissa[mantissa_size] = 1; //leading bit
-            un_mantissa[mantissa_size+1] = 0; //leave space for sign
 
             float un_exponent = float(exponent) - (hls::pow(2, exponent_size - 1) - 1);
 
-            result = float(un_mantissa)*hls::pow(float(2.0), un_exponent);
-            if(sign < 0)
+            result = float(un_mantissa)*hls::pow(float(2.0), un_exponent - mantissa_size);
+            if(sign == 1)
                 result = -result;
         }
         return result;
@@ -84,50 +85,88 @@ struct floatX
     {
         floatX result;
 
-        ap_int<mantissa_size+2> mantissa_1 = mantissa;
-        ap_int<exponent_size> exponent_1 = exponent;
-        mantissa_1[mantissa_size] = 1; //leading bit
-        mantissa_1[mantissa_size+1] = 0; //leave space for sign
+        bool sign_1 = sign;
+        ap_uint<mantissa_size+2> unnorm_mantissa_1 = mantissa;
+        ap_uint<exponent_size> exponent_1 = exponent;
+
+        if(exponent_1 == 0)
+            unnorm_mantissa_1[mantissa_size] = 0; 
+        else
+            unnorm_mantissa_1[mantissa_size] = 1; //leading bit
+
+        unnorm_mantissa_1[mantissa_size+1] = 0; //leave space for sign
         
-        ap_int<mantissa_size+2> mantissa_2 = c.mantissa;
-        ap_int<exponent_size> exponent_2 = c.exponent;
-        mantissa_2[mantissa_size] = 1; //leading bit
-        mantissa_2[mantissa_size+1] = 0; //leave space for sign
+        bool sign_2 = c.sign;
+        ap_uint<mantissa_size+2> unnorm_mantissa_2 = c.mantissa;
+        ap_uint<exponent_size> exponent_2 = c.exponent;
+
+        if(exponent_2 == 0)
+            unnorm_mantissa_2[mantissa_size] = 0;
+        else
+            unnorm_mantissa_2[mantissa_size] = 1; //leading bit
+
+        unnorm_mantissa_2[mantissa_size+1] = 0; //leave space for sign
 
         if(exponent_1 < exponent_2)
         {
-            ap_int<mantissa_size+2> aux_mantissa = mantissa_1;
-            ap_int<exponent_size> aux_exponent = exponent_1;
-            mantissa_1 = mantissa_2;
+            bool aux_sign = sign_1;
+            ap_uint<mantissa_size+2> aux_mantissa = unnorm_mantissa_1;
+            ap_uint<exponent_size> aux_exponent = exponent_1;
+            sign_1 = sign_2;
+            unnorm_mantissa_1 = unnorm_mantissa_2;
             exponent_1 = exponent_2;
-            mantissa_2 = aux_mantissa;
+            sign_2 = aux_sign;
+            unnorm_mantissa_2 = aux_mantissa;
             exponent_2 = aux_exponent;
         }
 
-        ap_int<exponent_size> exponent_diff = exponent_1 - exponent_2;
+        ap_uint<exponent_size> exponent_diff = exponent_1 - exponent_2;
 
-        if(sign == 1)
-            mantissa_1 = -mantissa_1;
-        if(c.sign == 1)
-            mantissa_2 = -mantissa_2;
+        ap_int<mantissa_size+2> signed_mantissa_1 = unnorm_mantissa_1;
+        ap_int<mantissa_size+2> signed_mantissa_2 = unnorm_mantissa_2;
 
-        mantissa_2 = mantissa_2 << exponent_diff;
+        if(sign_1 == 1)
+            signed_mantissa_1 = -signed_mantissa_1;
+        if(sign_2 == 1)
+            signed_mantissa_2 = -signed_mantissa_2;
 
-        ap_int<mantissa_size+3> res_mantissa = mantissa_1 + mantissa_2;
+        const int added_zeros = 4;//mantissa_size;
 
-        bool sign = 0;
+        ap_int<mantissa_size+2+added_zeros> signed_mantissa_zeros_1;
+        signed_mantissa_zeros_1(mantissa_size+1+added_zeros, added_zeros) = signed_mantissa_1;
+        signed_mantissa_zeros_1(added_zeros-1, 0) = 0;
+        ap_int<mantissa_size+2+added_zeros> signed_mantissa_zeros_2;
+        signed_mantissa_zeros_2(mantissa_size+1+added_zeros, added_zeros) = signed_mantissa_2;
+        signed_mantissa_zeros_2(added_zeros-1, 0) = 0;
+
+        signed_mantissa_zeros_2 = signed_mantissa_zeros_2 >> exponent_diff;
+
+        ap_int<mantissa_size+3+added_zeros> res_mantissa = signed_mantissa_zeros_1 + signed_mantissa_zeros_2;
+
+        bool res_sign = 0;
         if(res_mantissa < 0)
         {
-            sign = 1;
+            res_sign = 1;
             res_mantissa = -res_mantissa;
         }
 
         int leading_zeros = count_leading_zeros(res_mantissa);
 
-        result.sign = sign;
-        result.exponent = exponent_1 + leading_zeros;
-        result.mantissa = res_mantissa(1, mantissa_size);
+        ap_uint<exponent_size> res_exponent = exponent_1 + 2 - leading_zeros;
+        ap_uint<mantissa_size+3+added_zeros> norm_mantissa = res_mantissa << (leading_zeros + 1);
 
+        if(res_mantissa == 0)
+        {
+            result.sign = 0;
+            result.exponent = 0;
+            result.mantissa = 0;
+        }
+        else 
+        {
+            result.sign = res_sign;
+            result.exponent = res_exponent;
+            result.mantissa(mantissa_size-1, 0) = norm_mantissa(mantissa_size+2+added_zeros, 3+added_zeros);
+        }
         return result;
     }
 
@@ -135,41 +174,41 @@ struct floatX
     {
         floatX result;
         
-        ap_int<mantissa_size+1> unnorm_mantissa_1 = mantissa;
-        if(exponent != 0)
-            unnorm_mantissa_1[mantissa_size] = 1; //leading bit
-        else
+        ap_uint<mantissa_size+1> unnorm_mantissa_1 = mantissa;
+        if(exponent == 0)
             unnorm_mantissa_1[mantissa_size] = 0; //leading bit
-
-        ap_int<exponent_size> unnorm_exponent_1 = exponent - hls::pow(2, exponent_size - 1) + 1;
-        
-        ap_int<mantissa_size+1> unnorm_mantissa_2 = c.mantissa;
-        if(c.exponent != 0)
-            unnorm_mantissa_2[mantissa_size] = 1; //leading bit
         else
+            unnorm_mantissa_1[mantissa_size] = 1; //leading bit
+
+        ap_int<exponent_size> unnorm_exponent_1 = exponent - (hls::pow(2, exponent_size - 1) - 1);
+        
+        ap_uint<mantissa_size+1> unnorm_mantissa_2 = c.mantissa;
+        if(c.exponent == 0)
             unnorm_mantissa_2[mantissa_size] = 0; //leading bit
+        else
+            unnorm_mantissa_2[mantissa_size] = 1; //leading bit
 
         ap_int<exponent_size> unnorm_exponent_2 = c.exponent - (hls::pow(2, exponent_size - 1) - 1);
 
-        ap_int<(mantissa_size+1)*2> res_mantissa = unnorm_mantissa_1*unnorm_mantissa_2;
+        ap_uint<(mantissa_size+1)*2> res_mantissa = unnorm_mantissa_1*unnorm_mantissa_2;
         ap_int<exponent_size+1> res_exponent = unnorm_exponent_1 + unnorm_exponent_2;
 
-        int leading_zeros = count_leading_zeros<(mantissa_size+1)*2>(res_mantissa) - 1;
+        int leading_zeros = count_leading_zeros(res_mantissa);
 
-        res_mantissa = res_mantissa << leading_zeros;
-        res_exponent = res_exponent + leading_zeros;
+        ap_uint<(mantissa_size+1)*2> norm_mantissa = res_mantissa << (leading_zeros + 1);
+        ap_int<exponent_size+1> norm_exponent = res_exponent - leading_zeros + hls::pow(2, exponent_size - 1);
 
-        if(res_mantissa != 0)
-        {
-            result.sign = sign ^ c.sign;
-            result.mantissa = res_mantissa(1, mantissa_size);
-            result.exponent = res_exponent + hls::pow(2, exponent_size - 1) - 1;
-        }
-        else
+        if(res_mantissa == 0)
         {
             result.sign = 0;
             result.mantissa = 0;
             result.exponent = 0;
+        }
+        else
+        {
+            result.sign = sign ^ c.sign;
+            result.mantissa(mantissa_size-1, 0) = norm_mantissa((mantissa_size+1)*2-1, mantissa_size+2);
+            result.exponent = norm_exponent;
         }
 
         return result;
@@ -178,8 +217,64 @@ struct floatX
     floatX operator-(floatX c)
     {
         floatX negated = c;
-        //netaged.sign = not netaged.sign;
-        return negated;
+        negated.sign = !negated.sign;
+        floatX result = (*this)+ negated;
+        return result;
+    }
+
+    floatX operator/(floatX c)
+    {
+        floatX result;
+        
+        ap_uint<mantissa_size+1> unnorm_mantissa_1 = mantissa;
+        if(exponent == 0)
+            unnorm_mantissa_1[mantissa_size] = 0; //leading bit
+        else
+            unnorm_mantissa_1[mantissa_size] = 1; //leading bit
+
+        ap_int<exponent_size> unnorm_exponent_1 = exponent - (hls::pow(2, exponent_size - 1) - 1);
+        
+        ap_uint<mantissa_size+1> unnorm_mantissa_2 = c.mantissa;
+        if(c.exponent == 0)
+            unnorm_mantissa_2[mantissa_size] = 0; //leading bit
+        else
+            unnorm_mantissa_2[mantissa_size] = 1; //leading bit
+
+        ap_int<exponent_size> unnorm_exponent_2 = c.exponent - (hls::pow(2, exponent_size - 1) - 1);
+
+        const int added_zeros = mantissa_size;
+
+        ap_uint<mantissa_size+1+added_zeros> bigger_mantissa_1;
+        bigger_mantissa_1(mantissa_size+added_zeros, added_zeros) = unnorm_mantissa_1(mantissa_size, 0);
+        bigger_mantissa_1(added_zeros-1, 0) = 0;
+        //bigger_mantissa_1 = bigger_mantissa_1 << added_zeros;
+
+        ap_uint<mantissa_size+1+added_zeros> bigger_mantissa_2;
+        bigger_mantissa_2(mantissa_size+added_zeros, mantissa_size+1) = 0;
+        bigger_mantissa_2(mantissa_size, 0) = unnorm_mantissa_2(mantissa_size, 0);
+
+        ap_uint<mantissa_size+1+added_zeros> res_mantissa = bigger_mantissa_1/bigger_mantissa_2;
+        ap_int<exponent_size+1> res_exponent = unnorm_exponent_1 - unnorm_exponent_2;
+
+        int leading_zeros = count_leading_zeros(res_mantissa);
+
+        ap_uint<mantissa_size+1+added_zeros> norm_mantissa = res_mantissa << (leading_zeros + 1);
+        ap_int<exponent_size+1> norm_exponent = res_exponent - leading_zeros + hls::pow(2, exponent_size - 1) - 1;
+
+        if(res_mantissa == 0)
+        {
+            result.sign = 0;
+            result.mantissa = 0;
+            result.exponent = 0;
+        }
+        else
+        {
+            result.sign = sign ^ c.sign;
+            result.mantissa(mantissa_size-1, 0) = norm_mantissa(mantissa_size+added_zeros, 1+added_zeros);
+            result.exponent = norm_exponent;
+        }
+
+        return result;
     }
 
     void operator=(floatX c)
@@ -193,7 +288,7 @@ struct floatX
     //ap_fixed<exponent_size, exponent_size, AP_RND> exponent;
 
     bool sign;
-    ap_int<mantissa_size> mantissa;
-    ap_int<exponent_size> exponent;
+    ap_uint<mantissa_size> mantissa;
+    ap_uint<exponent_size> exponent;
 };
 
