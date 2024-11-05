@@ -130,18 +130,18 @@ struct floatX
         if(sign_2 == 1)
             signed_mantissa_2 = -signed_mantissa_2;
 
-        const int added_zeros = 4;//mantissa_size;
+        const int add_added_zeros = 4;//mantissa_size;
 
-        ap_int<mantissa_size+2+added_zeros> signed_mantissa_zeros_1;
-        signed_mantissa_zeros_1(mantissa_size+1+added_zeros, added_zeros) = signed_mantissa_1;
-        signed_mantissa_zeros_1(added_zeros-1, 0) = 0;
-        ap_int<mantissa_size+2+added_zeros> signed_mantissa_zeros_2;
-        signed_mantissa_zeros_2(mantissa_size+1+added_zeros, added_zeros) = signed_mantissa_2;
-        signed_mantissa_zeros_2(added_zeros-1, 0) = 0;
+        ap_int<mantissa_size+2+add_added_zeros> signed_mantissa_zeros_1;
+        signed_mantissa_zeros_1(mantissa_size+1+add_added_zeros, add_added_zeros) = signed_mantissa_1;
+        signed_mantissa_zeros_1(add_added_zeros-1, 0) = 0;
+        ap_int<mantissa_size+2+add_added_zeros> signed_mantissa_zeros_2;
+        signed_mantissa_zeros_2(mantissa_size+1+add_added_zeros, add_added_zeros) = signed_mantissa_2;
+        signed_mantissa_zeros_2(add_added_zeros-1, 0) = 0;
 
         signed_mantissa_zeros_2 = signed_mantissa_zeros_2 >> exponent_diff;
 
-        ap_int<mantissa_size+3+added_zeros> res_mantissa = signed_mantissa_zeros_1 + signed_mantissa_zeros_2;
+        ap_int<mantissa_size+3+add_added_zeros> res_mantissa = signed_mantissa_zeros_1 + signed_mantissa_zeros_2;
 
         bool res_sign = 0;
         if(res_mantissa < 0)
@@ -153,7 +153,7 @@ struct floatX
         int leading_zeros = count_leading_zeros(res_mantissa);
 
         ap_uint<exponent_size> res_exponent = exponent_1 + 2 - leading_zeros;
-        ap_uint<mantissa_size+3+added_zeros> norm_mantissa = res_mantissa << (leading_zeros + 1);
+        ap_uint<mantissa_size+3+add_added_zeros> norm_mantissa = res_mantissa << (leading_zeros + 1);
 
         if(res_mantissa == 0)
         {
@@ -165,7 +165,7 @@ struct floatX
         {
             result.sign = res_sign;
             result.exponent = res_exponent;
-            result.mantissa(mantissa_size-1, 0) = norm_mantissa(mantissa_size+2+added_zeros, 3+added_zeros);
+            result.mantissa(mantissa_size-1, 0) = norm_mantissa(mantissa_size+2+add_added_zeros, 3+add_added_zeros);
         }
         return result;
     }
@@ -242,24 +242,25 @@ struct floatX
 
         ap_int<exponent_size> unnorm_exponent_2 = c.exponent - (hls::pow(2, exponent_size - 1) - 1);
 
-        const int added_zeros = mantissa_size;
+        const int div_added_zeros = 32;//mantissa_size+2;
 
-        ap_uint<mantissa_size+1+added_zeros> bigger_mantissa_1;
-        bigger_mantissa_1(mantissa_size+added_zeros, added_zeros) = unnorm_mantissa_1(mantissa_size, 0);
-        bigger_mantissa_1(added_zeros-1, 0) = 0;
-        //bigger_mantissa_1 = bigger_mantissa_1 << added_zeros;
+        ap_uint<mantissa_size+1+div_added_zeros> bigger_mantissa_1;// = unnorm_mantissa_1;
+        bigger_mantissa_1(mantissa_size+div_added_zeros, div_added_zeros) = unnorm_mantissa_1(mantissa_size, 0);
+        bigger_mantissa_1(div_added_zeros-1, 0) = 0;
+        //bigger_mantissa_1 = bigger_mantissa_1 << div_added_zeros;
 
-        ap_uint<mantissa_size+1+added_zeros> bigger_mantissa_2;
-        bigger_mantissa_2(mantissa_size+added_zeros, mantissa_size+1) = 0;
+        ap_uint<mantissa_size+1+div_added_zeros> bigger_mantissa_2;
+        bigger_mantissa_2(mantissa_size+div_added_zeros, mantissa_size+1) = 0;
         bigger_mantissa_2(mantissa_size, 0) = unnorm_mantissa_2(mantissa_size, 0);
 
-        ap_uint<mantissa_size+1+added_zeros> res_mantissa = bigger_mantissa_1/bigger_mantissa_2;
+        ap_uint<mantissa_size+1+div_added_zeros> res_mantissa = bigger_mantissa_1/bigger_mantissa_2;
+
         ap_int<exponent_size+1> res_exponent = unnorm_exponent_1 - unnorm_exponent_2;
 
         int leading_zeros = count_leading_zeros(res_mantissa);
 
-        ap_uint<mantissa_size+1+added_zeros> norm_mantissa = res_mantissa << (leading_zeros + 1);
-        ap_int<exponent_size+1> norm_exponent = res_exponent - leading_zeros + hls::pow(2, exponent_size - 1) - 1;
+        ap_uint<mantissa_size+1+div_added_zeros> norm_mantissa = res_mantissa << (leading_zeros + 1);
+        ap_int<exponent_size+1> norm_exponent = res_exponent + mantissa_size - leading_zeros + hls::pow(2, exponent_size - 1) - 1;
 
         if(res_mantissa == 0)
         {
@@ -270,7 +271,7 @@ struct floatX
         else
         {
             result.sign = sign ^ c.sign;
-            result.mantissa(mantissa_size-1, 0) = norm_mantissa(mantissa_size+added_zeros, 1+added_zeros);
+            result.mantissa(mantissa_size-1, 0) = norm_mantissa(mantissa_size+div_added_zeros, div_added_zeros+1);
             result.exponent = norm_exponent;
         }
 

@@ -6,14 +6,14 @@
 
 int main(void)
 {
-    float sum_max_diff = 0.001f;
-    float res_max_diff = 0.001f;
-    float mul_max_diff = 0.001f;
-    float div_max_diff = 0.001f;
+    float sum_max_diff = 0.00001f;
+    float res_max_diff = 0.00001f;
+    float mul_max_diff = 0.00001f;
+    float div_max_diff = 0.00001f;
 
-    for(double a = -32.0f; a < 32.0f; a+=1.0f)//pow(2.0f, -5.0f))
+    for(float a = -32.0f; a < 32.0f; a+=1.0f)//pow(2.0f, -5.0f))
     {
-        for(double b = -32.0f; b < 32.0f; b+=0.01f)//pow(2.0f, -5.0f))
+        for(float b = -0.00000071525573730469f; b < 32.0f; b+=0.01f)//pow(2.0f, -5.0f))
         {
             bool failed = false;
 
@@ -36,10 +36,10 @@ int main(void)
             }
             */
 
-            double sum = a + b;
-            double res = a - b;
-            double mul = a * b;
-            double div = a / b;
+            float sum = a + b;
+            float res = a - b;
+            float mul = a * b;
+            float div = a / b;
 
             floatX<23, 8> sum_mixed = a_mixed + b_mixed;
             floatX<23, 8> res_mixed = a_mixed - b_mixed;
