@@ -5,8 +5,10 @@
 #include "ap_fixed.h"
 #include "hls_half.h"
 #include "hls_stream.h"
+#include "floatX.h"
 
 //typedef ap_fixed<24, 12, AP_RND> data_type;
+//typedef floatX<10, 5> data_type;
 typedef float data_type;
 //typedef half data_type;
 //typedef int data_type;

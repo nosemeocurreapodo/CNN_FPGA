@@ -957,14 +957,18 @@ public:
 
     mat3<type> getMat3(int width)
     {
+        #pragma HLS INLINE
+
         mat3<type> mat;
         
         get_mat3_y_loop:
         for(int y = 0; y < 3; y++)
         {
+            #pragma HLS UNROLL
             get_mat3_x_loop:
             for(int x = 0; x < 3; x++)
             {
+                #pragma HLS UNROLL
                 mat(y, x) = data[x + width*y];
             }
         }
@@ -972,6 +976,6 @@ public:
         return mat;
     }
 
-private:
+//private:
     type data[size];
 };

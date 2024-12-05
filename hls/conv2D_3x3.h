@@ -8,6 +8,6 @@
 #include "data_types.h"
 #include "types.h"
 
-#define MAX_WIDTH 640
+#define MAX_WIDTH 32
 
 extern int conv2D_3x3(hls::stream<packet> &input, hls::stream<packet> &output, int &in_width, float kernel[9]);

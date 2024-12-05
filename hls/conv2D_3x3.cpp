@@ -9,18 +9,13 @@ int conv2D_3x3(hls::stream<packet> &input, hls::stream<packet> &output, int &in_
 #pragma HLS INTERFACE s_axilite port = return
 
     shift_register<data_type, MAX_WIDTH*3> shift_reg;
+//#pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic
     // #pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
 
     mat3<data_type> kernel;
 #pragma HLS ARRAY_PARTITION variable = kernel.data dim = 0 type = complete
 
     // initialize buffers
-
-init_buffer_loop:
-    for (int i = 0; i < 3 * MAX_WIDTH; i++)
-    {
-        shift_reg.shift_down(0);
-    }
 
 init_kernel_y_loop:
     for (int y = 0; y < 3; y++)
@@ -30,8 +25,14 @@ init_kernel_y_loop:
         for (int x = 0; x < 3; x++)
         {
 #pragma HLS UNROLL
-            kernel.data[y][x] = kernel_data[x + y * 3];
+            kernel.data[y][x] = data_type(kernel_data[x + y * 3]);
         }
+    }
+    
+init_buffer_loop:
+    for (int i = 0; i < 3 * MAX_WIDTH; i++)
+    {
+        shift_reg.shift_down(0);
     }
 
     bool last_was_read = false;
@@ -71,7 +72,7 @@ main_loop:
         data_type conv = data.mul_v2(kernel);
 
         packet out_packet;
-        out_packet.data = conv;
+        out_packet.data = conv;//.to_float();
         output.write(out_packet);
     }
 

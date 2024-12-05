@@ -10,7 +10,7 @@
 int main(void)
 {
     cv::Mat inMat = cv::imread("/mnt/nvme0n1p5/datasets/desktop_dataset/images/scene_000.png", cv::IMREAD_GRAYSCALE);
-    //cv::resize(imageMat, imageMat, cv::Size(width, height), cv::INTER_AREA);
+    //cv::resize(inMat, inMat, cv::Size(MAX_WIDTH, MAX_WIDTH), cv::INTER_AREA);
     
     int width = inMat.cols;
     int height = inMat.rows;
@@ -18,6 +18,7 @@ int main(void)
     std::cout << "height " << height << " width " << width << std::endl;
 
     cv::Mat outMat(height, width, CV_32FC1, cv::Scalar(0));
+    cv::Mat diffMat(height, width, CV_32FC1, cv::Scalar(0));
 
 	hls::stream<packet> s_in;
 	hls::stream<packet> s_out;
@@ -38,9 +39,9 @@ int main(void)
 	}
 
     float kernel[3*3] = {0};
-/*
+
     kernel[0] = 1.0;
-    kernel[1] = 1.0;
+    kernel[1] = 2.0;
     kernel[2] = 1.0;
 
     kernel[3] = 0.0;
@@ -48,11 +49,11 @@ int main(void)
     kernel[5] = 0.0;
 
     kernel[6] = -1.0;
-    kernel[7] = -1.0;
+    kernel[7] = -2.0;
     kernel[8] = -1.0;
-*/
 
-    kernel[4] = 1.0;
+
+//    kernel[4] = 1.0;
 /*
     kernel[0] = 1.0/9.0;
     kernel[1] = 1.0/9.0;
@@ -76,10 +77,12 @@ int main(void)
             s_out.read(out_packet);
 
             outMat.at<float>(y, x) = out_packet.data;
+            diffMat.at<float>(y, x) = fabs(out_packet.data - float(inMat.at<uchar>(y, x)));
         }
 	}
 
     cv::imwrite("scene_000_filtered.png", outMat);
+    cv::imwrite("scene_000_diff.png", diffMat);
 
     return 0;
 }

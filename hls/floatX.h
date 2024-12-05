@@ -8,6 +8,7 @@ template <typename type>
 int count_leading_zeros(type mantissa)
 {
     int leading_zeros = 0;
+    count_leading_zeros_loop:
     for(int i = mantissa.width-1; i >= 0; i--)
     {
         if(mantissa[i] == 0)
@@ -30,7 +31,7 @@ struct floatX
     {
         float fp = c;
         
-        float abs_fp = abs(fp);
+        float abs_fp = fabs(fp);
 
         if(abs_fp == 0.0)
         {
