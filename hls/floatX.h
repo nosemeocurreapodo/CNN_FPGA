@@ -102,16 +102,16 @@ struct floatX
         //unsigned int* bitsPtr = (unsigned int*)&c;
         //unsigned int bits = *bitsPtr; // Dereference to get the raw bits
 
-        ap_uint<8> _exponent = bits(30, 24);
+        ap_uint<8> _exponent = bits(31, 23);
         ap_int<9> __exponent = _exponent - hls::pow(2, 7);
 
         sign = bits[31];
         exponent = __exponent + hls::pow(2, exponent_size - 1);
 
         if(23 > mantissa_size)
-            mantissa = bits(23, 23 - mantissa_size);
+            mantissa = bits(22, 23 - mantissa_size);
         else
-            mantissa = bits(23, 0);
+            mantissa = bits(22, 0);
 
     }
     /*
@@ -146,17 +146,17 @@ struct floatX
         ap_uint<32> bits = 0;
         if(exponent != 0)
         { 
-            bits[31] = sign;
+            bits(31, 31) = sign;
             
             ap_int<exponent_size+1> _exponent = exponent - hls::pow(2, exponent_size-1);
             ap_int<8> __exponent = _exponent + hls::pow(2, 7);
 
-            bits(24 + exponent_size, 24) = __exponent;
+            bits(22 + exponent_size, 23) = __exponent;
 
             if(23 > mantissa_size)
-                bits(23, 23 - mantissa_size) = mantissa;
+                bits(22, 23 - mantissa_size) = mantissa;
             else
-                bits(23, 0) = mantissa(mantissa_size-1, mantissa_size-1-23);
+                bits(22, 0) = mantissa(mantissa_size-1, mantissa_size-23);
         }
 
         float fresult = *reinterpret_cast<float*>(&bits);
