@@ -1,6 +1,6 @@
 #include "conv2D_3x3.h"
 
-int conv2D_3x3(hls::stream<packet> &input, hls::stream<packet> &output, int &in_width, float kernel_data[3 * 3])
+int conv2D_3x3(hls::stream<packet> &input, hls::stream<packet> &output, int &in_width, int &in_height, float kernel_data[3 * 3])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
@@ -28,24 +28,25 @@ init_kernel_y_loop:
             kernel.data[y][x] = data_type(kernel_data[x + y * 3]);
         }
     }
-    
+
 init_buffer_loop:
-    for (int i = 0; i < 3 * MAX_WIDTH; i++)
+    for (int i = 0; i < 3 * in_width; i++)
     {
-        shift_reg.shift_down(0);
+        packet in_packet;
+        input.read(in_packet);
+        data_type in_data = data_type(in_packet.data);
+        shift_reg.shift_down(in_data);
     }
 
     bool last_was_read = false;
-    int data_counter = 0;
-    int padding_data_counter = 0;
 
 main_loop:
-    while (true)
+    for(int i = 0; i < in_width*in_height; i++)
     {
 // #pragma HLS PIPELINE II=1
 #pragma HLS LOOP_TRIPCOUNT min = 307200 max = 307200
 
-        data_type in_data = data_type(0.0);
+        data_type in_data = data_type(0.0f);
         if (!last_was_read)
         {
             packet in_packet;
@@ -53,26 +54,15 @@ main_loop:
             in_data = data_type(in_packet.data);
             if (in_packet.last == 1)
                 last_was_read = true;
-            data_counter++;
-        }
-        else
-        {
-            padding_data_counter++;
         }
 
         shift_reg.shift_down(in_data);
-
-        if (data_counter <= MAX_WIDTH*3 - in_width - 1)
-            continue;
-
-        if (padding_data_counter > MAX_WIDTH*3 - in_width - 1)
-            break;
 
         mat3<data_type> data = shift_reg.getMat3(in_width);
         data_type conv = data.mul_v2(kernel);
 
         packet out_packet;
-        out_packet.data = conv;//.to_float();
+        out_packet.data = float(conv);
         output.write(out_packet);
     }
 

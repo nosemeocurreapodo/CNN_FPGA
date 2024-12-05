@@ -7,6 +7,8 @@
 template <typename type>
 int count_leading_zeros(type mantissa)
 {
+    #pragma HLS INLINE
+
     int leading_zeros = 0;
     count_leading_zeros_loop:
     for(int i = mantissa.width-1; i >= 0; i--)
@@ -26,9 +28,11 @@ struct floatX
     {
         
     }
-
+    /*
     floatX(float c)
     {
+        #pragma HLS INLINE
+
         float fp = c;
         
         float abs_fp = fabs(fp);
@@ -60,9 +64,61 @@ struct floatX
             mantissa = man__; 
         }
     }
-
-    float to_float()
+    */
+    /*
+    floatX(float c)
     {
+        #pragma HLS INLINE
+
+        // Reinterpret the float as an integer
+        unsigned int bits = *reinterpret_cast<unsigned int*>(&c);
+        //unsigned int* bitsPtr = (unsigned int*)&c;
+        //unsigned int bits = *bitsPtr; // Dereference to get the raw bits
+
+        // Extract the sign (1 bit)
+        bool _sign = (bits >> 31) & 0x1;
+
+        // Extract the exponent (8 bits, biased by 127)
+        ap_uint<9> _exponent = (bits >> 23) & 0xFF;
+        ap_int<9> __exponent = _exponent - hls::pow(2, 7);
+
+        // Extract the mantissa (23 bits)
+        ap_uint<23> _mantissa = bits & 0x7FFFFF; // Mask to get the last 23 bits
+
+        sign = _sign;
+        exponent = __exponent + hls::pow(2, exponent_size - 1);
+        if(23 > mantissa_size)
+            mantissa = _mantissa >> (23 - mantissa_size);
+        else
+            mantissa = _mantissa << (mantissa_size - 23);
+
+    }
+    */
+    floatX(float c)
+    {
+        #pragma HLS INLINE
+
+        ap_uint<32> bits = *reinterpret_cast<ap_uint<32>*>(&c);
+        //unsigned int* bitsPtr = (unsigned int*)&c;
+        //unsigned int bits = *bitsPtr; // Dereference to get the raw bits
+
+        ap_uint<8> _exponent = bits(30, 24);
+        ap_int<9> __exponent = _exponent - hls::pow(2, 7);
+
+        sign = bits[31];
+        exponent = __exponent + hls::pow(2, exponent_size - 1);
+
+        if(23 > mantissa_size)
+            mantissa = bits(23, 23 - mantissa_size);
+        else
+            mantissa = bits(23, 0);
+
+    }
+    /*
+    operator float()
+    {
+        #pragma HLS INLINE
+
         float result;
         if(exponent == 0)
         {
@@ -73,17 +129,44 @@ struct floatX
             ap_uint<mantissa_size+1> un_mantissa = mantissa;
             un_mantissa[mantissa_size] = 1; //leading bit
 
-            float un_exponent = float(exponent) - (hls::pow(2, exponent_size - 1) - 1);
+            ap_int<exponent_size+1> un_exponent = exponent - (hls::pow(2, exponent_size - 1) - 1);
 
-            result = float(un_mantissa)*hls::pow(float(2.0), un_exponent - mantissa_size);
+            result = float(un_mantissa)*hls::pow(2.0f, un_exponent - mantissa_size);
             if(sign == 1)
                 result = -result;
         }
         return result;
     }
+    */
+
+    operator float()
+    {
+        #pragma HLS INLINE
+
+        ap_uint<32> bits = 0;
+        if(exponent != 0)
+        { 
+            bits[31] = sign;
+            
+            ap_int<exponent_size+1> _exponent = exponent - hls::pow(2, exponent_size-1);
+            ap_int<8> __exponent = _exponent + hls::pow(2, 7);
+
+            bits(24 + exponent_size, 24) = __exponent;
+
+            if(23 > mantissa_size)
+                bits(23, 23 - mantissa_size) = mantissa;
+            else
+                bits(23, 0) = mantissa(mantissa_size-1, mantissa_size-1-23);
+        }
+
+        float fresult = *reinterpret_cast<float*>(&bits);
+        return fresult;
+    }
 
     floatX operator+(floatX c)
     {
+        #pragma HLS INLINE
+
         floatX result;
 
         bool sign_1 = sign;
@@ -173,6 +256,8 @@ struct floatX
 
     floatX operator*(floatX c)
     {
+        #pragma HLS INLINE
+
         floatX result;
         
         ap_uint<mantissa_size+1> unnorm_mantissa_1 = mantissa;
@@ -217,6 +302,8 @@ struct floatX
 
     floatX operator-(floatX c)
     {
+        #pragma HLS INLINE
+
         floatX negated = c;
         negated.sign = !negated.sign;
         floatX result = (*this)+ negated;
@@ -225,6 +312,8 @@ struct floatX
 
     floatX operator/(floatX c)
     {
+        #pragma HLS INLINE
+
         floatX result;
         
         ap_uint<mantissa_size+1> unnorm_mantissa_1 = mantissa;
@@ -281,6 +370,8 @@ struct floatX
 
     void operator=(floatX c)
     {
+        #pragma HLS INLINE
+            
         sign = c.sign;
         exponent = c.exponent;
         mantissa = c.mantissa;
