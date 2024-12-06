@@ -264,6 +264,217 @@ struct vec6
     type data[6];
 };
 
+
+template <typename type>
+struct mat2
+{
+    mat2()
+    {
+    }
+
+    mat2(type d00, type d01, type d10, type d11)
+    {
+        data[0][0] = d00;
+        data[0][1] = d01;
+        data[1][0] = d10;
+        data[1][1] = d11;
+    }
+
+    void zero()
+    {
+        mat2_zero_y_loop:
+        for (int y = 0; y < 2; y++)
+        {
+            mat2_zero_x_loop:
+            for (int x = 0; x < 2; x++)
+            {
+                data[y][x] = 0.0;
+            }
+        }
+    }
+
+    void identity()
+    {
+        data[0][0] = 1.0;
+        data[0][1] = 0.0;
+        data[1][0] = 0.0;
+        data[1][1] = 1.0;
+    }
+
+    mat2 transpose()
+    {
+        mat2<type> result;
+        result(0, 0) = data[0][0];
+        result(0, 1) = data[1][0];
+        result(1, 0) = data[0][1];
+        result(1, 1) = data[1][1];
+        return result;
+    }
+
+    /*
+        mat3 inverse()
+        {
+        double determinant =    +A(0,0)*(A(1,1)*A(2,2)-A(2,1)*A(1,2))
+                            -A(0,1)*(A(1,0)*A(2,2)-A(1,2)*A(2,0))
+                            +A(0,2)*(A(1,0)*A(2,1)-A(1,1)*A(2,0));
+    double invdet = 1/determinant;
+    result(0,0) =  (A(1,1)*A(2,2)-A(2,1)*A(1,2))*invdet;
+    result(1,0) = -(A(0,1)*A(2,2)-A(0,2)*A(2,1))*invdet;
+    result(2,0) =  (A(0,1)*A(1,2)-A(0,2)*A(1,1))*invdet;
+    result(0,1) = -(A(1,0)*A(2,2)-A(1,2)*A(2,0))*invdet;
+    result(1,1) =  (A(0,0)*A(2,2)-A(0,2)*A(2,0))*invdet;
+    result(2,1) = -(A(0,0)*A(1,2)-A(1,0)*A(0,2))*invdet;
+    result(0,2) =  (A(1,0)*A(2,1)-A(2,0)*A(1,1))*invdet;
+    result(1,2) = -(A(0,0)*A(2,1)-A(2,0)*A(0,1))*invdet;
+    result(2,2) =  (A(0,0)*A(1,1)-A(1,0)*A(0,1))*invdet;
+        }
+        */
+
+    template <typename type2>
+    mat2 operator / (type2 c)
+    {
+        mat2<type> result;
+
+        mat2_div_y_loop:
+        for (int y = 0; y < 2; y++)
+        {
+            mat2_div_x_loop:
+            for (int x = 0; x < 2; x++)
+            {
+                result.data[y][x] = data[y][x] / c;
+            }
+        }
+
+        return result;
+    }
+
+    template <typename type2>
+    mat2 operator*(type2 c)
+    {
+        mat2<type> result;
+
+        mat2_mult_y_loop:
+        for (int y = 0; y < 2; y++)
+        {
+            mat2_mult_x_loop:
+            for (int x = 0; x < 2; x++)
+            {
+                result.data[y][x] = data[y][x] * c;
+            }
+        }
+
+        return result;
+    }
+
+    mat2 dot(mat2 c)
+    {
+        mat2<type> result;
+
+        mat2_dot_y_loop:
+        for (int y = 0; y < 2; y++)
+        {
+            mat2_dot_x_loop:
+            for (int x = 0; x < 2; x++)
+            {
+                result.data[y][x] = data[y][0] * c(0, x) + data[y][1] * c(1, x);
+            }
+        }
+
+        return result;
+    }
+
+    vec2<type> dot(vec2<type> c) const
+    {
+        vec2<type> result;
+
+        mat2_dot_loop:
+        for (int y = 0; y < 2; y++)
+        {
+            result(y) = data[y][0] * c(0) + data[y][1] * c(1) + data[y][2] * c(2);
+        }
+
+        return result;
+    }
+
+    type mul_v1(mat2<type> c)
+    {
+//#pragma HLS INLINE
+        type result = 0.0;
+
+        mat2_mul_v1_y_loop:
+        for (int y = 0; y < 2; y++)
+        {
+            mat2_mul_v1_x_loop:
+            for (int x = 0; x < 2; x++)
+            {
+                result += data[y][x] * c(y, x);
+            }
+        }
+
+        return result;
+    }
+
+    type mul_v2(mat2<type> c)
+	{
+//#pragma HLS INLINE
+
+        type mul[2][2];
+//#pragma HLS ARRAY_PARTITION variable = mul complete dim = 0
+
+        mat2_mul_v2_y_loop:
+        for(int y = 0; y < 2; y++)
+        {
+//#pragma HLS unroll
+            mat2_mul_v2_x_loop:
+            for(int x =0; x < 2; x++)
+            {
+//#pragma HLS unroll
+                mul[y][x] = data[y][x]*c(y, x);
+            }
+        }
+
+		type sum_lvl1_0  = mul[0][0] + mul[1][0];
+		type sum_lvl1_1  = mul[0][1] + mul[1][1];
+
+        type res = sum_lvl1_0 + sum_lvl1_1;
+
+		return res;
+	}
+
+    type getMax()
+	{
+//#pragma HLS INLINE
+        type max1 = hls::max(data[0][0], data[0][1]);
+        type max2 = hls::max(data[1][0], data[1][1]);
+        return hls::max(max1, max2);
+        /*
+        mat2_max_y_loop:
+        for(int y = 0; y < 2; y++)
+        {
+            mat2_max_x_loop:
+            for(int x = 0; x < 2; x++)
+            {
+                if(data[y][x] > val)
+                    val = data[y][x];
+            }
+        }
+        return val;
+        */
+    }
+
+    type &operator()(int b, int c)
+    {
+        return data[b][c];
+    }
+
+    type operator()(int b, int c) const
+    {
+        return data[b][c];
+    }
+
+    type data[2][2];
+};
+
 template <typename type>
 struct mat3
 {
@@ -425,7 +636,7 @@ struct mat3
 
     type mul_v2(mat3<type> c)
 	{
-#pragma HLS INLINE
+//#pragma HLS INLINE
 
         type mul[3][3];
 //#pragma HLS ARRAY_PARTITION variable = mul complete dim = 0
@@ -433,11 +644,11 @@ struct mat3
         mat3_mul_v2_y_loop:
         for(int y = 0; y < 3; y++)
         {
-#pragma HLS unroll
+//#pragma HLS unroll
             mat3_mul_v2_x_loop:
             for(int x =0; x < 3; x++)
             {
-#pragma HLS unroll
+//#pragma HLS unroll
                 mul[y][x] = data[y][x]*c(y, x);
             }
         }
@@ -942,12 +1153,12 @@ public:
 
     void shift_down(type val)
     {
-#pragma HLS INLINE
+//#pragma HLS INLINE
 
     shift_down_loop:
         for (int i = 0; i < size - 1; i++)
         {
-#pragma HLS UNROLL
+//#pragma HLS UNROLL
 
             data[i] = data[i + 1];
         }
@@ -955,20 +1166,41 @@ public:
         data[size - 1] = val;
     }
 
+    mat2<type> getMat2(int width)
+    {
+//#pragma HLS INLINE
+
+        mat2<type> mat;
+        
+        get_mat2_y_loop:
+        for(int y = 0; y < 2; y++)
+        {
+//#pragma HLS UNROLL
+            get_mat2_x_loop:
+            for(int x = 0; x < 2; x++)
+            {
+//#pragma HLS UNROLL
+                mat(y, x) = data[x + width*y];
+            }
+        }
+        
+        return mat;
+    }
+
     mat3<type> getMat3(int width)
     {
-        #pragma HLS INLINE
+//#pragma HLS INLINE
 
         mat3<type> mat;
         
         get_mat3_y_loop:
         for(int y = 0; y < 3; y++)
         {
-            #pragma HLS UNROLL
+//#pragma HLS UNROLL
             get_mat3_x_loop:
             for(int x = 0; x < 3; x++)
             {
-                #pragma HLS UNROLL
+//#pragma HLS UNROLL
                 mat(y, x) = data[x + width*y];
             }
         }

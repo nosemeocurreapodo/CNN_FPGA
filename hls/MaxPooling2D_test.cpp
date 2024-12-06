@@ -5,7 +5,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "conv2D_3x3.h"
+#include "MaxPooling2D.h"
 
 int main(void)
 {
@@ -19,17 +19,16 @@ int main(void)
 
     std::cout << "height " << height << " width " << width << std::endl;
 
-    cv::Mat outMat(height, width, CV_32FC1, cv::Scalar(0));
-    cv::Mat diffMat(height, width, CV_32FC1, cv::Scalar(0));
+    cv::Mat outMat(height/2, width/2, CV_32FC1, cv::Scalar(0));
 
-	hls::stream<conv_packet> s_in;
-	hls::stream<conv_packet> s_out;
+	hls::stream<mp2D_packet> s_in;
+	hls::stream<mp2D_packet> s_out;
 
     for (int y = 0; y < height; y++)
 	{
         for(int x = 0; x < width; x++)
         {
-            conv_packet in_packet;
+            mp2D_packet in_packet;
 
             in_packet.data = float(inMat.at<uchar>(y, x));
             in_packet.last = false;
@@ -40,51 +39,20 @@ int main(void)
         }
 	}
 
-    float kernel[3*3] = {0};
+    MaxPooling2D(s_in, s_out, width, height); 
 
-    kernel[0] = 1.0;
-    kernel[1] = 2.0;
-    kernel[2] = 1.0;
-
-    kernel[3] = 0.0;
-    kernel[4] = 0.0;
-    kernel[5] = 0.0;
-
-    kernel[6] = -1.0;
-    kernel[7] = -2.0;
-    kernel[8] = -1.0;
-
-
-//    kernel[4] = 1.0;
-/*
-    kernel[0] = 1.0/9.0;
-    kernel[1] = 1.0/9.0;
-    kernel[2] = 1.0/9.0;
-
-    kernel[3] = 1.0/9.0;
-    kernel[4] = 1.0/9.0;
-    kernel[5] = 1.0/9.0;
-
-    kernel[6] = 1.0/9.0;
-    kernel[7] = 1.0/9.0;
-    kernel[8] = 1.0/9.0;
-*/
-    conv2D_3x3(s_in, s_out, width, height, kernel); 
-
-    for (int y = 0; y < height; y++)
+    for (int y = 0; y < height/2; y++)
 	{
-        for(int x = 0; x < width; x++)
+        for(int x = 0; x < width/2; x++)
         {
-            conv_packet out_packet;
+            mp2D_packet out_packet;
             s_out.read(out_packet);
 
             outMat.at<float>(y, x) = out_packet.data;
-            diffMat.at<float>(y, x) = fabs(out_packet.data - float(inMat.at<uchar>(y, x)));
         }
 	}
 
-    cv::imwrite("scene_000_filtered.png", outMat);
-    cv::imwrite("scene_000_diff.png", diffMat);
+    cv::imwrite("MaxPoolingOut.png", outMat);
 
     return 0;
 }
