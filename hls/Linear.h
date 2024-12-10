@@ -22,4 +22,4 @@ typedef float linear_data_type;
 
 typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> linear_packet;
 
-extern int Linear(hls::stream<linear_packet> &input, hls::stream<linear_packet> &output, int &in_size, int &max_width, float weights[LINEAR_MAX_WIDTH]);
+extern int Linear(hls::stream<linear_packet> &input, hls::stream<linear_packet> &output, int &in_size, float weights[LINEAR_MAX_WIDTH]);

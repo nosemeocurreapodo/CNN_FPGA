@@ -1,16 +1,13 @@
 #include "conv2D_3x3.h"
 
-int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, int &max_width, float weights[3 * 3])
+int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, float weights[3 * 3])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
 #pragma HLS INTERFACE s_axilite port = in_width
 #pragma HLS INTERFACE s_axilite port = in_height
-#pragma HLS INTERFACE s_axilite port = max_width
 #pragma HLS INTERFACE s_axilite port = weights
 #pragma HLS INTERFACE s_axilite port = return
-
-    max_width = CONV_MAX_WIDTH;
 
     shift_register<conv_data_type, CONV_MAX_WIDTH * 3> shift_reg;
     // #pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic

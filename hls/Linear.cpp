@@ -1,16 +1,13 @@
 #include "Linear.h"
 
-int Linear(hls::stream<linear_packet> &input, hls::stream<linear_packet> &output, int &in_size, int &out_size, int &max_width, float weights[LINEAR_MAX_WIDTH])
+int Linear(hls::stream<linear_packet> &input, hls::stream<linear_packet> &output, int &in_size, int &out_size, float weights[LINEAR_MAX_WIDTH])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
 #pragma HLS INTERFACE s_axilite port = in_size
 #pragma HLS INTERFACE s_axilite port = out_size
-#pragma HLS INTERFACE s_axilite port = max_width
 #pragma HLS INTERFACE s_axilite port = weights
 #pragma HLS INTERFACE s_axilite port = return
-
-    max_width = LINEAR_MAX_WIDTH;
 
     linear_data_type output_data[LINEAR_MAX_WIDTH];
 

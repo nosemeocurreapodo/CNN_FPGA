@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Mon Dec  9 17:09:05 2024" VIVADOVERSION="2024.1.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Tue Dec 10 11:56:48 2024" VIVADOVERSION="2024.1.2">
 
   <SYSTEMINFO ARCH="zynq" BOARD="tul.com.tw:pynq-z2:part0:1.0" DEVICE="7z020" NAME="design_1" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -159,7 +159,7 @@
   </EXTERNALINTERFACES>
 
   <MODULES>
-    <MODULE COREREVISION="2113858203" FULLNAME="/Linear_0" HWVERSION="1.0" INSTANCE="Linear_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="Linear" VLNV="xilinx.com:hls:Linear:1.0">
+    <MODULE COREREVISION="2113859632" FULLNAME="/Linear_0" HWVERSION="1.0" INSTANCE="Linear_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="Linear" VLNV="xilinx.com:hls:Linear:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="read-write" INTERFACE="s_axi_control" NAME="Reg" RANGE="65536" USAGE="register">
@@ -434,8 +434,8 @@
                 </FIELD>
               </FIELDS>
             </REGISTER>
-            <REGISTER NAME="Memory_kernel">
-              <PROPERTY NAME="DESCRIPTION" VALUE="Memory kernel"/>
+            <REGISTER NAME="Memory_weights">
+              <PROPERTY NAME="DESCRIPTION" VALUE="Memory weights"/>
               <PROPERTY NAME="ADDRESS_OFFSET" VALUE="1024"/>
               <PROPERTY NAME="SIZE" VALUE="1024"/>
               <PROPERTY NAME="ACCESS" VALUE="read-write"/>
@@ -705,7 +705,7 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE COREREVISION="2113854024" FULLNAME="/MaxPooling2D_0" HWVERSION="1.0" INSTANCE="MaxPooling2D_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="MaxPooling2D" VLNV="xilinx.com:hls:MaxPooling2D:1.0">
+    <MODULE COREREVISION="2113859635" FULLNAME="/MaxPooling2D_0" HWVERSION="1.0" INSTANCE="MaxPooling2D_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="MaxPooling2D" VLNV="xilinx.com:hls:MaxPooling2D:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="read-write" INTERFACE="s_axi_control" NAME="Reg" RANGE="65536" USAGE="register">
@@ -1243,7 +1243,7 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE COREREVISION="2113858207" FULLNAME="/ReLU_0" HWVERSION="1.0" INSTANCE="ReLU_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="ReLU" VLNV="xilinx.com:hls:ReLU:1.0">
+    <MODULE COREREVISION="2113859634" FULLNAME="/ReLU_0" HWVERSION="1.0" INSTANCE="ReLU_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="ReLU" VLNV="xilinx.com:hls:ReLU:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="read-write" INTERFACE="s_axi_control" NAME="Reg" RANGE="65536" USAGE="register">
@@ -8708,7 +8708,7 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE COREREVISION="2113854023" FULLNAME="/conv2D_3x3_0" HWVERSION="1.0" INSTANCE="conv2D_3x3_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="conv2D_3x3" VLNV="xilinx.com:hls:conv2D_3x3:1.0">
+    <MODULE COREREVISION="2113859631" FULLNAME="/conv2D_3x3_0" HWVERSION="1.0" INSTANCE="conv2D_3x3_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="conv2D_3x3" VLNV="xilinx.com:hls:conv2D_3x3:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="read-write" INTERFACE="s_axi_control" NAME="Reg" RANGE="65536" USAGE="register">
@@ -8983,8 +8983,8 @@
                 </FIELD>
               </FIELDS>
             </REGISTER>
-            <REGISTER NAME="Memory_kernel_data">
-              <PROPERTY NAME="DESCRIPTION" VALUE="Memory kernel_data"/>
+            <REGISTER NAME="Memory_weights">
+              <PROPERTY NAME="DESCRIPTION" VALUE="Memory weights"/>
               <PROPERTY NAME="ADDRESS_OFFSET" VALUE="64"/>
               <PROPERTY NAME="SIZE" VALUE="64"/>
               <PROPERTY NAME="ACCESS" VALUE="read-write"/>
@@ -10304,8 +10304,6 @@
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="ACLK"/>
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S01_ACLK"/>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M04_ACLK"/>
-            <CONNECTION INSTANCE="MaxPooling2D_0" PORT="ap_clk"/>
-            <CONNECTION INSTANCE="conv2D_3x3_0" PORT="ap_clk"/>
             <CONNECTION INSTANCE="axi_dma_maxpool2D" PORT="m_axi_mm2s_aclk"/>
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S02_ACLK"/>
             <CONNECTION INSTANCE="axi_dma_maxpool2D" PORT="m_axi_s2mm_aclk"/>
@@ -10313,7 +10311,6 @@
             <CONNECTION INSTANCE="axi_dma_maxpool2D" PORT="s_axi_lite_aclk"/>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M05_ACLK"/>
             <CONNECTION INSTANCE="axi_dma_conv2D" PORT="m_axi_s2mm_aclk"/>
-            <CONNECTION INSTANCE="Linear_0" PORT="ap_clk"/>
             <CONNECTION INSTANCE="axi_dma_relu" PORT="m_axi_mm2s_aclk"/>
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S04_ACLK"/>
             <CONNECTION INSTANCE="axi_dma_relu" PORT="m_axi_s2mm_aclk"/>
@@ -10326,7 +10323,10 @@
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S07_ACLK"/>
             <CONNECTION INSTANCE="axi_dma_linear" PORT="s_axi_lite_aclk"/>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M07_ACLK"/>
+            <CONNECTION INSTANCE="Linear_0" PORT="ap_clk"/>
+            <CONNECTION INSTANCE="MaxPooling2D_0" PORT="ap_clk"/>
             <CONNECTION INSTANCE="ReLU_0" PORT="ap_clk"/>
+            <CONNECTION INSTANCE="conv2D_3x3_0" PORT="ap_clk"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="FCLK_RESET0_N" POLARITY="ACTIVE_LOW" SIGIS="rst" SIGNAME="processing_system7_0_FCLK_RESET0_N">
@@ -12512,13 +12512,10 @@
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="ARESETN"/>
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S01_ARESETN"/>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M04_ARESETN"/>
-            <CONNECTION INSTANCE="MaxPooling2D_0" PORT="ap_rst_n"/>
-            <CONNECTION INSTANCE="conv2D_3x3_0" PORT="ap_rst_n"/>
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S02_ARESETN"/>
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S03_ARESETN"/>
             <CONNECTION INSTANCE="axi_dma_maxpool2D" PORT="axi_resetn"/>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M05_ARESETN"/>
-            <CONNECTION INSTANCE="Linear_0" PORT="ap_rst_n"/>
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S04_ARESETN"/>
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S05_ARESETN"/>
             <CONNECTION INSTANCE="axi_dma_relu" PORT="axi_resetn"/>
@@ -12527,7 +12524,10 @@
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S07_ARESETN"/>
             <CONNECTION INSTANCE="axi_dma_linear" PORT="axi_resetn"/>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M07_ARESETN"/>
+            <CONNECTION INSTANCE="Linear_0" PORT="ap_rst_n"/>
+            <CONNECTION INSTANCE="MaxPooling2D_0" PORT="ap_rst_n"/>
             <CONNECTION INSTANCE="ReLU_0" PORT="ap_rst_n"/>
+            <CONNECTION INSTANCE="conv2D_3x3_0" PORT="ap_rst_n"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="0" NAME="peripheral_reset" POLARITY="ACTIVE_HIGH" RIGHT="0" SIGIS="rst"/>

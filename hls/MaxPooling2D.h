@@ -23,4 +23,4 @@ typedef float mp2D_data_type;
 
 typedef  hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> mp2D_packet;
 
-extern int MaxPooling2D(hls::stream<mp2D_packet> &input, hls::stream<mp2D_packet> &output, int &in_width, int &in_height, int &max_width);
+extern int MaxPooling2D(hls::stream<mp2D_packet> &input, hls::stream<mp2D_packet> &output, int &in_width, int &in_height);
