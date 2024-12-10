@@ -1,12 +1,14 @@
 #include "MaxPooling2D.h"
 
-int MaxPooling2D(hls::stream<mp2D_packet> &input, hls::stream<mp2D_packet> &output, int &in_width, int &in_height)
+int MaxPooling2D(hls::stream<mp2D_packet> &input, hls::stream<mp2D_packet> &output, int &in_width, int &in_height, int &max_width)
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
 #pragma HLS INTERFACE s_axilite port = in_width
 #pragma HLS INTERFACE s_axilite port = in_height
 #pragma HLS INTERFACE s_axilite port = return
+
+    max_width = MP2D_MAX_WIDTH;
 
     shift_register<mp2D_data_type, MP2D_MAX_WIDTH*2> shift_reg;
 //#pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic

@@ -1,17 +1,20 @@
 #include "conv2D_3x3.h"
 
-int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, float kernel_data[3 * 3])
+int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, int &max_width, float weights[3 * 3])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
 #pragma HLS INTERFACE s_axilite port = in_width
 #pragma HLS INTERFACE s_axilite port = in_height
-#pragma HLS INTERFACE s_axilite port = kernel_data
+#pragma HLS INTERFACE s_axilite port = max_width
+#pragma HLS INTERFACE s_axilite port = weights
 #pragma HLS INTERFACE s_axilite port = return
 
-    shift_register<conv_data_type, CONV_MAX_WIDTH*3> shift_reg;
-//#pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic
-    // #pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
+    max_width = CONV_MAX_WIDTH;
+
+    shift_register<conv_data_type, CONV_MAX_WIDTH * 3> shift_reg;
+    // #pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic
+    //  #pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
 
     mat3<conv_data_type> kernel;
 #pragma HLS ARRAY_PARTITION variable = kernel.data dim = 0 type = complete
@@ -26,7 +29,7 @@ init_kernel_y_loop:
         for (int x = 0; x < 3; x++)
         {
 #pragma HLS UNROLL
-            kernel.data[y][x] = conv_data_type(kernel_data[x + y * 3]);
+            kernel.data[y][x] = conv_data_type(weights[x + y * 3]);
         }
     }
 
@@ -42,7 +45,7 @@ init_buffer_loop:
     bool last_was_read = false;
 
 main_loop:
-    for(int i = 0; i < in_width*in_height; i++)
+    for (int i = 0; i < in_width * in_height; i++)
     {
 // #pragma HLS PIPELINE II=1
 #pragma HLS LOOP_TRIPCOUNT min = 307200 max = 307200

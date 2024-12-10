@@ -16,8 +16,8 @@ main_loop:
         relu_packet in_packet;
         input.read(in_packet);
         relu_data_type in_data = relu_data_type(in_packet.data);
+        
         relu_data_type out_data = relu_data_type(0.0f);
-
         if(in_data > relu_data_type(0.0f))
             out_data = in_data;
 
