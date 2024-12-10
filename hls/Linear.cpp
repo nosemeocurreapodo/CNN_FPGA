@@ -41,6 +41,13 @@ write_output_loop:
     {
         linear_packet out_packet;
         out_packet.data = float(output_data[i]);
+        out_packet.keep = -1;
+        out_packet.strb = -1;
+        if(i == out_size - 1)
+            out_packet.last = true;
+        else
+            out_packet.last = false;
+            
         output.write(out_packet);
     }
 

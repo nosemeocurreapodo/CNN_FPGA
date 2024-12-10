@@ -64,6 +64,13 @@ main_loop:
 
         conv_packet out_packet;
         out_packet.data = float(conv);
+        out_packet.keep = -1;
+        out_packet.strb = -1;
+        if(i == in_width * in_height - 1)
+            out_packet.last = true;
+        else
+            out_packet.last = false;
+
         output.write(out_packet);
     }
 

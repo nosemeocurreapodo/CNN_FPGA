@@ -27,6 +27,7 @@ init_buffer_loop:
     }
 
     bool last_was_read = false;
+    int out_counter = 0;
 
 main_loop:
     for(int i = 0; i < in_width*in_height; i++)
@@ -55,7 +56,15 @@ main_loop:
 
         mp2D_packet out_packet;
         out_packet.data = float(max_val);
+        out_packet.keep = -1;
+        out_packet.strb = -1;
+        if(out_counter == in_width*in_height/4 - 1)
+            out_packet.last = true;
+        else
+            out_packet.last = false;
+        
         output.write(out_packet);
+        out_counter++;
     }
 
     return 0;

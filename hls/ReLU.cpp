@@ -23,6 +23,13 @@ main_loop:
 
         relu_packet out_packet;
         out_packet.data = float(out_data);
+        out_packet.keep = -1;
+        out_packet.strb = -1;
+        if(i == data_size - 1)
+            out_packet.last = true;
+        else
+            out_packet.last = false;
+
         output.write(out_packet);
 
         //if (in_packet.last == 1)
