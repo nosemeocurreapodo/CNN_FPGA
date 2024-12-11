@@ -143,12 +143,13 @@ def main():
         #print(model_scripted)
         #model_scripted.save('model_scripted.pt') # Save
 
-        torch.save(model.state_dict(), "mnist_cnn.pt")
-        state_dict = torch.load("mnist_cnn.pt", weights_only=True)
+        #torch.save(model.state_dict(), "mnist_cnn.pt")
+        #state_dict = torch.load("mnist_cnn.pt", weights_only=True)
+        state_dict = model.state_dict()
         state_dict_numpy = {}
         for key in state_dict:
             #print(f"{key}: {type(state_dict[key])}")
-            state_dict_numpy[key] = state_dict[key].cpu().detach().numpy()
+            state_dict_numpy[key] = state_dict[key].cpu().detach().numpy().tolist()
         #print(state_dict_numpy)
         #print(state_dict)
         
