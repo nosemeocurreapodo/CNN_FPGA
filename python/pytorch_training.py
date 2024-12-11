@@ -1,4 +1,5 @@
 import argparse
+import pickle
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -138,6 +139,8 @@ def main():
 
     if args.save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")
+        with open("mnist_cnn.pkl", "wb") as f:
+            pickle.dump(model.state_dict(), f)
 
 
 if __name__ == '__main__':
