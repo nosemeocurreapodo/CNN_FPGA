@@ -1,6 +1,6 @@
 #include "Linear.h"
 
-int Linear(hls::stream<linear_packet> &input, hls::stream<linear_packet> &output, int &in_size, int &out_size, float weights[LINEAR_MAX_WIDTH], float bias[LINEAR_MAX_WIDTH])
+int Linear(hls::stream<linear_packet> &input, hls::stream<linear_packet> &output, int &in_size, int &out_size, float weights[LINEAR_MAX_IN_SIZE*LINEAR_MAX_OUT_SIZE], float bias[LINEAR_MAX_OUT_SIZE])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
@@ -10,7 +10,7 @@ int Linear(hls::stream<linear_packet> &input, hls::stream<linear_packet> &output
 #pragma HLS INTERFACE s_axilite port = bias
 #pragma HLS INTERFACE s_axilite port = return
 
-    linear_data_type output_data[LINEAR_MAX_WIDTH];
+    linear_data_type output_data[LINEAR_MAX_IN_SIZE*LINEAR_MAX_OUT_SIZE];
 
 set_zero_loop:
     for (int i = 0; i < out_size; i++)
@@ -31,7 +31,7 @@ main_loop:
     dot_product_loop:
         for (int i = 0; i < out_size; i++)
         {
-            output_data[i] += in_data * weights[i];
+            output_data[i] += in_data * weights[j*in_size + i];
         }
         // if (in_packet.last == 1)
         //     break;
