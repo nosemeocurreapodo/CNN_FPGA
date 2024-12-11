@@ -8,7 +8,7 @@
 #include "floatX.h"
 #include "types.h"
 
-#define MP2D_MAX_WIDTH 256
+#define MP2D_MAX_WIDTH 640
 
 //typedef ap_fixed<24, 12, AP_RND> relu_data_type;
 //typedef ap_float<32, 8> relu_data_type;

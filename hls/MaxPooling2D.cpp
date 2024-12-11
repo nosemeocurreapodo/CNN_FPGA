@@ -48,7 +48,7 @@ main_loop:
         shift_reg.shift_down(in_data);
         int y = int(i / in_width);
         int x = i - y*in_width;
-        if(x % 2 == 1 || y % 2 == 1)
+        if(x % 2 != 0 || y % 2 != 0)
             continue;
 
         mat2<mp2D_data_type> data = shift_reg.getMat2(in_width);
