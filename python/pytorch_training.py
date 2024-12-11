@@ -1,5 +1,6 @@
 import argparse
 import pickle
+import json
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -138,9 +139,30 @@ def main():
         scheduler.step()
 
     if args.save_model:
+        #model_scripted = torch.jit.script(model) # Export to TorchScript
+        #print(model_scripted)
+        #model_scripted.save('model_scripted.pt') # Save
+
         torch.save(model.state_dict(), "mnist_cnn.pt")
+        state_dict = torch.load("mnist_cnn.pt", weights_only=True)
+        state_dict_numpy = {}
+        for key in state_dict:
+            #print(f"{key}: {type(state_dict[key])}")
+            state_dict_numpy[key] = state_dict[key].cpu().detach().numpy()
+        #print(state_dict_numpy)
+        #print(state_dict)
+        
         with open("mnist_cnn.pkl", "wb") as f:
-            pickle.dump(model.state_dict(), f)
+            pickle.dump(state_dict_numpy, f)
+        #with open("mnist_cnn.json", "wb") as f2:
+        #    json.dump(state_dict_numpy, f2)
+        
+        #state_dict_plain = {k: v.tolist() for k, v in state_dict.items()}
+        #print(state_dict_plain)
+        #with open("mnist_cnn.pkl", "wb") as f:
+        #    pickle.dump(state_dict_plain, f)
+        #with open("mnist_cnn.json", "wb") as f2:
+        #    json.dump(state_dict_plain, f2)
 
 
 if __name__ == '__main__':
