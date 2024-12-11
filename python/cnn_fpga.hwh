@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Tue Dec 10 12:31:27 2024" VIVADOVERSION="2024.1.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Wed Dec 11 11:35:49 2024" VIVADOVERSION="2024.1.2">
 
   <SYSTEMINFO ARCH="zynq" BOARD="tul.com.tw:pynq-z2:part0:1.0" DEVICE="7z020" NAME="design_1" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -159,7 +159,7 @@
   </EXTERNALINTERFACES>
 
   <MODULES>
-    <MODULE COREREVISION="2113859665" FULLNAME="/Linear_0" HWVERSION="1.0" INSTANCE="Linear_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="Linear" VLNV="xilinx.com:hls:Linear:1.0">
+    <MODULE COREREVISION="2113861052" FULLNAME="/Linear_0" HWVERSION="1.0" INSTANCE="Linear_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="Linear" VLNV="xilinx.com:hls:Linear:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="read-write" INTERFACE="s_axi_control" NAME="Reg" RANGE="65536" USAGE="register">
@@ -442,11 +442,19 @@
               <PROPERTY NAME="IS_ENABLED" VALUE="true"/>
               <PROPERTY NAME="RESET_VALUE" VALUE="0"/>
             </REGISTER>
+            <REGISTER NAME="Memory_bias">
+              <PROPERTY NAME="DESCRIPTION" VALUE="Memory bias"/>
+              <PROPERTY NAME="ADDRESS_OFFSET" VALUE="2048"/>
+              <PROPERTY NAME="SIZE" VALUE="1024"/>
+              <PROPERTY NAME="ACCESS" VALUE="read-write"/>
+              <PROPERTY NAME="IS_ENABLED" VALUE="true"/>
+              <PROPERTY NAME="RESET_VALUE" VALUE="0"/>
+            </REGISTER>
           </REGISTERS>
         </ADDRESSBLOCK>
       </ADDRESSBLOCKS>
       <PARAMETERS>
-        <PARAMETER NAME="C_S_AXI_CONTROL_ADDR_WIDTH" VALUE="11"/>
+        <PARAMETER NAME="C_S_AXI_CONTROL_ADDR_WIDTH" VALUE="12"/>
         <PARAMETER NAME="C_S_AXI_CONTROL_DATA_WIDTH" VALUE="32"/>
         <PARAMETER NAME="Component_Name" VALUE="design_1_Linear_0_0"/>
         <PARAMETER NAME="II" VALUE="undef"/>
@@ -520,7 +528,7 @@
             <CONNECTION INSTANCE="axi_dma_linear" PORT="s_axis_s2mm_tvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="10" NAME="s_axi_control_ARADDR" RIGHT="0" SIGIS="undef" SIGNAME="Linear_0_s_axi_control_ARADDR">
+        <PORT DIR="I" LEFT="11" NAME="s_axi_control_ARADDR" RIGHT="0" SIGIS="undef" SIGNAME="Linear_0_s_axi_control_ARADDR">
           <CONNECTIONS>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M04_AXI_araddr"/>
           </CONNECTIONS>
@@ -535,7 +543,7 @@
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M04_AXI_arvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="10" NAME="s_axi_control_AWADDR" RIGHT="0" SIGIS="undef" SIGNAME="Linear_0_s_axi_control_AWADDR">
+        <PORT DIR="I" LEFT="11" NAME="s_axi_control_AWADDR" RIGHT="0" SIGIS="undef" SIGNAME="Linear_0_s_axi_control_AWADDR">
           <CONNECTIONS>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M04_AXI_awaddr"/>
           </CONNECTIONS>
@@ -608,7 +616,7 @@
       </PORTS>
       <BUSINTERFACES>
         <BUSINTERFACE BUSNAME="ps7_0_axi_periph_M04_AXI" DATAWIDTH="32" NAME="s_axi_control" TYPE="SLAVE" VLNV="xilinx.com:interface:aximm:1.0">
-          <PARAMETER NAME="ADDR_WIDTH" VALUE="11"/>
+          <PARAMETER NAME="ADDR_WIDTH" VALUE="12"/>
           <PARAMETER NAME="ARUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="AWUSER_WIDTH" VALUE="0"/>
           <PARAMETER NAME="BUSER_WIDTH" VALUE="0"/>
@@ -705,7 +713,7 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE COREREVISION="2113859668" FULLNAME="/MaxPooling2D_0" HWVERSION="1.0" INSTANCE="MaxPooling2D_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="MaxPooling2D" VLNV="xilinx.com:hls:MaxPooling2D:1.0">
+    <MODULE COREREVISION="2113859834" FULLNAME="/MaxPooling2D_0" HWVERSION="1.0" INSTANCE="MaxPooling2D_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="MaxPooling2D" VLNV="xilinx.com:hls:MaxPooling2D:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="read-write" INTERFACE="s_axi_control" NAME="Reg" RANGE="65536" USAGE="register">
@@ -8708,7 +8716,7 @@
         </BUSINTERFACE>
       </BUSINTERFACES>
     </MODULE>
-    <MODULE COREREVISION="2113859663" FULLNAME="/conv2D_3x3_0" HWVERSION="1.0" INSTANCE="conv2D_3x3_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="conv2D_3x3" VLNV="xilinx.com:hls:conv2D_3x3:1.0">
+    <MODULE COREREVISION="2113861054" FULLNAME="/conv2D_3x3_0" HWVERSION="1.0" INSTANCE="conv2D_3x3_0" IPTYPE="PERIPHERAL" IS_ENABLE="1" MODCLASS="PERIPHERAL" MODTYPE="conv2D_3x3" VLNV="xilinx.com:hls:conv2D_3x3:1.0">
       <DOCUMENTS/>
       <ADDRESSBLOCKS>
         <ADDRESSBLOCK ACCESS="read-write" INTERFACE="s_axi_control" NAME="Reg" RANGE="65536" USAGE="register">
@@ -8973,6 +8981,26 @@
               <FIELDS>
                 <FIELD NAME="in_height">
                   <PROPERTY NAME="DESCRIPTION" VALUE="Bit 31 to 0 of in_height"/>
+                  <PROPERTY NAME="ADDRESS_OFFSET" VALUE="0"/>
+                  <PROPERTY NAME="ACCESS" VALUE="write-only"/>
+                  <PROPERTY NAME="MODIFIED_READ_VALUES" VALUE=""/>
+                  <PROPERTY NAME="WRITE_CONSTRAINT" VALUE="0"/>
+                  <PROPERTY NAME="READ_ACTION" VALUE=""/>
+                  <PROPERTY NAME="BIT_OFFSET" VALUE="0"/>
+                  <PROPERTY NAME="BIT_WIDTH" VALUE="32"/>
+                </FIELD>
+              </FIELDS>
+            </REGISTER>
+            <REGISTER NAME="bias">
+              <PROPERTY NAME="DESCRIPTION" VALUE="Data signal of bias"/>
+              <PROPERTY NAME="ADDRESS_OFFSET" VALUE="40"/>
+              <PROPERTY NAME="SIZE" VALUE="32"/>
+              <PROPERTY NAME="ACCESS" VALUE="write-only"/>
+              <PROPERTY NAME="IS_ENABLED" VALUE="true"/>
+              <PROPERTY NAME="RESET_VALUE" VALUE="0"/>
+              <FIELDS>
+                <FIELD NAME="bias">
+                  <PROPERTY NAME="DESCRIPTION" VALUE="Bit 31 to 0 of bias"/>
                   <PROPERTY NAME="ADDRESS_OFFSET" VALUE="0"/>
                   <PROPERTY NAME="ACCESS" VALUE="write-only"/>
                   <PROPERTY NAME="MODIFIED_READ_VALUES" VALUE=""/>
@@ -10323,9 +10351,9 @@
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S07_ACLK"/>
             <CONNECTION INSTANCE="axi_dma_linear" PORT="s_axi_lite_aclk"/>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M07_ACLK"/>
-            <CONNECTION INSTANCE="Linear_0" PORT="ap_clk"/>
-            <CONNECTION INSTANCE="MaxPooling2D_0" PORT="ap_clk"/>
             <CONNECTION INSTANCE="ReLU_0" PORT="ap_clk"/>
+            <CONNECTION INSTANCE="MaxPooling2D_0" PORT="ap_clk"/>
+            <CONNECTION INSTANCE="Linear_0" PORT="ap_clk"/>
             <CONNECTION INSTANCE="conv2D_3x3_0" PORT="ap_clk"/>
           </CONNECTIONS>
         </PORT>
@@ -12524,9 +12552,9 @@
             <CONNECTION INSTANCE="axi_mem_intercon" PORT="S07_ARESETN"/>
             <CONNECTION INSTANCE="axi_dma_linear" PORT="axi_resetn"/>
             <CONNECTION INSTANCE="ps7_0_axi_periph" PORT="M07_ARESETN"/>
-            <CONNECTION INSTANCE="Linear_0" PORT="ap_rst_n"/>
-            <CONNECTION INSTANCE="MaxPooling2D_0" PORT="ap_rst_n"/>
             <CONNECTION INSTANCE="ReLU_0" PORT="ap_rst_n"/>
+            <CONNECTION INSTANCE="MaxPooling2D_0" PORT="ap_rst_n"/>
+            <CONNECTION INSTANCE="Linear_0" PORT="ap_rst_n"/>
             <CONNECTION INSTANCE="conv2D_3x3_0" PORT="ap_rst_n"/>
           </CONNECTIONS>
         </PORT>
