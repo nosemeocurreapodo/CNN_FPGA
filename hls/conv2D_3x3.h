@@ -23,4 +23,4 @@ typedef float conv_data_type;
 
 typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> conv_packet;
 
-extern int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, float weights[9], float &bias);
+extern int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, float weights[9]);

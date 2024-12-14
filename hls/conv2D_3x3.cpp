@@ -1,13 +1,12 @@
 #include "conv2D_3x3.h"
 
-int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, float weights[3 * 3], float &bias)
+int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, float weights[3 * 3])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
 #pragma HLS INTERFACE s_axilite port = in_width
 #pragma HLS INTERFACE s_axilite port = in_height
 #pragma HLS INTERFACE s_axilite port = weights
-#pragma HLS INTERFACE s_axilite port = bias
 #pragma HLS INTERFACE s_axilite port = return
 
     shift_register<conv_data_type, CONV_MAX_WIDTH * 3> shift_reg;
@@ -61,7 +60,7 @@ main_loop:
         shift_reg.shift_down(in_data);
 
         mat3<conv_data_type> data = shift_reg.getMat3(in_width);
-        conv_data_type conv = data.mul_v2(kernel) + bias;
+        conv_data_type conv = data.mul_v2(kernel);
 
         conv_packet out_packet;
         out_packet.data = float(conv);

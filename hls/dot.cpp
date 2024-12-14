@@ -26,7 +26,7 @@ main_loop:
         dot_data_type in_data1 = dot_data_type(in_packet1.data);
 
         dot_packet in_packet2;
-        input1.read(in_packet2);
+        input2.read(in_packet2);
         dot_data_type in_data2 = dot_data_type(in_packet2.data);
 
         dot_data_type mul = in_data1*in_data2;
