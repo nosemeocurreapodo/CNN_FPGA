@@ -133,17 +133,17 @@ class SimpleDepthEstimationNet(nn.Module):
 class UNetDepthEstimator(nn.Module):
     def __init__(self, n_channels=3, n_classes=1):
         super(UNetDepthEstimator, self).__init__()
-        self.inc = DoubleConv(n_channels, 8)
-        self.down1 = Down(8, 16)
-        self.down2 = Down(16, 32)
+        self.inc = DoubleConv(n_channels, 16)
+        self.down1 = Down(16, 32)
+        self.down2 = Down(32, 64)
         #self.down3 = Down(256, 512)
         #self.down4 = Down(512, 512)
 
         #self.up1 = Up(512, 256)
         #self.up2 = Up(256, 128)
-        self.up3 = Up(32, 16)
-        self.up4 = Up(16, 8)
-        self.outc = nn.Conv2d(8, n_classes, kernel_size=1)
+        self.up3 = Up(64, 32)
+        self.up4 = Up(32, 16)
+        self.outc = nn.Conv2d(16, n_classes, kernel_size=1)
 
     def forward(self, x):
         x1 = self.inc(x)    # 16
@@ -204,7 +204,7 @@ def train_depth_estimator(model, train_loader, val_loader, epochs=10, lr=1e-3, d
         model.eval()
         val_loss = 0.0
         with torch.no_grad():
-            for images, depths in val_loader:
+            for i, (images, depths) in enumerate(val_loader):
                 images = images.to(device)
                 depths = depths.to(device)
                 preds = model(images)
@@ -215,15 +215,24 @@ def train_depth_estimator(model, train_loader, val_loader, epochs=10, lr=1e-3, d
         print(f"Epoch [{epoch+1}/{epochs}] - Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
         torch.save(model.state_dict(), "depth.pt")
         for images, depths, in val_loader:
-            image = images.cpu().detach().numpy()[0,0,:,:]
-            depth = depths.cpu().detach().numpy()[0,0,:,:]
+            images = images.to(device)
+            preds = model(images)
+
+            depth = preds.cpu().detach().numpy()[0,0,:,:]
             
             #image = np.transpose(image, (2, 1, 0))
             
-            image = 255.0 * image / np.max(image)
             depth = 255.0 * depth / np.max(depth)
-            cv2.imwrite(f'image_{epoch}.png', image)
             cv2.imwrite(f'depth_{epoch}.png', depth)
+            
+            if epoch == 0:
+                image = images.cpu().detach().numpy()[0,0,:,:]
+                depth = depths.cpu().detach().numpy()[0,0,:,:]
+                image = 255.0 * image / np.max(image)
+                depth = 255.0 * depth / np.max(depth)
+                cv2.imwrite(f'image_ref.png', image)
+                cv2.imwrite(f'depth_ref.png', depth)
+
             break
 
 
@@ -284,6 +293,6 @@ if __name__ == '__main__':
     train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=4)
     val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, num_workers=4)
 
-    model = SimpleDepthEstimationNet()
-    #model = UNetDepthEstimator()
+    #model = SimpleDepthEstimationNet()
+    model = UNetDepthEstimator()
     train_depth_estimator(model, train_loader, val_loader, epochs=100, lr=1e-3, device='cpu')
