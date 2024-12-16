@@ -7,19 +7,49 @@
 #include "ap_float.h"
 #include "floatX.h"
 
-#define DOT_PPBUFF_SIZE 16
+template <typename data_type, typename packet_type, int ppbuf_size>
+int dot(hls::stream<packet_type> &input1, hls::stream<packet_type> &input2, float &result, int &in_size)
+{
+#pragma HLS INTERFACE axis port = input1
+#pragma HLS INTERFACE axis port = input2
+#pragma HLS INTERFACE s_axilite port = result
+#pragma HLS INTERFACE s_axilite port = in_size
+#pragma HLS INTERFACE s_axilite port = return
 
-// typedef ap_fixed<24, 12, AP_RND> relu_data_type;
-// typedef ap_float<32, 8> relu_data_type;
-// typedef floatX<23, 8> relu_data_type;
-typedef float dot_data_type;
-// typedef half relu_data_type;
-// typedef int relu_data_type;
+    data_type res[ppbuf_size];
 
-// typedef ap_axis<32, 2, 5, 6> packet;
-// typedef hls::axis<float, 0, 0, 0> packet;
-// typedef hls::axis_data<float, AXIS_ENABLE_KEEP|AXIS_ENABLE_LAST> packet;
+init_loop:
+    for (int i = 0; i < ppbuf_size; i++)
+        res[i] = data_type(0.0f);
 
-typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> dot_packet;
+main_loop:
+    for (int i = 0; i < in_size; i++)
+    {
+// #pragma HLS PIPELINE II=1
+#pragma HLS LOOP_TRIPCOUNT min = 307200 max = 307200
 
-extern int dot(hls::stream<dot_packet> &input1, hls::stream<dot_packet> &input2, float &result, int &in_size);
+        packet_type in_packet1;
+        input1.read(in_packet1);
+        data_type in_data1 = data_type(in_packet1.data);
+
+        packet_type in_packet2;
+        input2.read(in_packet2);
+        data_type in_data2 = data_type(in_packet2.data);
+
+        data_type mul = in_data1 * in_data2;
+        res[i % ppbuf_size] += mul;
+
+        // if (in_packet.last == 1)
+        //     break;
+    }
+
+    data_type res2 = data_type(0.0f);
+
+final_loop:
+    for (int i = 0; i < ppbuf_size; i++)
+        res2 += res[i];
+
+    result = float(res2);
+
+    return 0;
+}

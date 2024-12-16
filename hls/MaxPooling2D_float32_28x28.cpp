@@ -1,6 +1,6 @@
-#include "MaxPooling2D_28x28.h"
+#include "MaxPooling2D_float32_28x28.h"
 
-int MaxPooling2D_28x28(hls::stream<mp_packet> &input, hls::stream<mp_packet> &output)
+int MaxPooling2D_float32_28x28(hls::stream<mp_packet> &input, hls::stream<mp_packet> &output)
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output

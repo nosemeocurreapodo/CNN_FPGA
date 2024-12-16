@@ -15,4 +15,4 @@
 
 typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> conv_packet;
 
-extern int conv2D_3x3_28x28(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, float weights[9]);
+extern int conv2D_3x3_float64_28x28(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, float weights[9]);

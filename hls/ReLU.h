@@ -2,23 +2,47 @@
 
 #include "ap_axi_sdata.h"
 #include "hls_stream.h"
-//#include "ap_int.h"
+// #include "ap_int.h"
 #include "ap_fixed.h"
 #include "ap_float.h"
 #include "floatX.h"
 
+template <typename data_type, typename packet_type>
+int ReLU(hls::stream<packet_type> &input, hls::stream<packet_type> &output, int &data_size)
+{
+#pragma HLS INTERFACE axis port = input
+#pragma HLS INTERFACE axis port = output
+#pragma HLS INTERFACE s_axilite port = data_size
+#pragma HLS INTERFACE s_axilite port = return
 
-//typedef ap_fixed<24, 12, AP_RND> relu_data_type;
-//typedef ap_float<32, 8> relu_data_type;
-//typedef floatX<23, 8> relu_data_type;
-typedef float relu_data_type;
-//typedef half relu_data_type;
-//typedef int relu_data_type;
+main_loop:
+    for (int i = 0; i < data_size; i++)
+    {
+// #pragma HLS PIPELINE II=1
+#pragma HLS LOOP_TRIPCOUNT min = 307200 max = 307200
 
-//typedef ap_axis<32, 2, 5, 6> packet;
-//typedef hls::axis<float, 0, 0, 0> packet;
-//typedef hls::axis_data<float, AXIS_ENABLE_KEEP|AXIS_ENABLE_LAST> packet;
+        packet_type in_packet;
+        input.read(in_packet);
+        data_type in_data = data_type(in_packet.data);
 
-typedef  hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> relu_packet;
+        data_type out_data = data_type(0.0f);
+        if (in_data > data_type(0.0f))
+            out_data = in_data;
 
-extern int ReLU(hls::stream<relu_packet> &input, hls::stream<relu_packet> &output, int &data_size);
+        packet_type out_packet;
+        out_packet.data = float(out_data);
+        out_packet.keep = -1;
+        out_packet.strb = -1;
+        if (i == data_size - 1)
+            out_packet.last = true;
+        else
+            out_packet.last = false;
+
+        output.write(out_packet);
+
+        // if (in_packet.last == 1)
+        //     break;
+    }
+
+    return 0;
+}

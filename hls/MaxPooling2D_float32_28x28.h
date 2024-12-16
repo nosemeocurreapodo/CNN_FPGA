@@ -15,4 +15,4 @@
 
 typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> mp_packet;
 
-extern int MaxPooling2D_28x28(hls::stream<mp_packet> &input, hls::stream<mp_packet> &output);
+extern int MaxPooling2D_float32_28x28(hls::stream<mp_packet> &input, hls::stream<mp_packet> &output);

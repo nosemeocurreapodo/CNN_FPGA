@@ -1,6 +1,6 @@
-#include "conv2D_3x3_28x28.h"
+#include "conv2D_3x3_float32_28x28.h"
 
-int conv2D_3x3_28x28(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, float weights[3 * 3])
+int conv2D_3x3_float32_28x28(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, float weights[3 * 3])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
