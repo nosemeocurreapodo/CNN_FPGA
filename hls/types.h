@@ -424,11 +424,11 @@ struct mat2
         mat2_mul_v2_y_loop:
         for(int y = 0; y < 2; y++)
         {
-//#pragma HLS unroll
+#pragma HLS unroll
             mat2_mul_v2_x_loop:
             for(int x =0; x < 2; x++)
             {
-//#pragma HLS unroll
+#pragma HLS unroll
                 mul[y][x] = data[y][x]*c(y, x);
             }
         }
@@ -644,11 +644,11 @@ struct mat3
         mat3_mul_v2_y_loop:
         for(int y = 0; y < 3; y++)
         {
-//#pragma HLS unroll
+#pragma HLS unroll
             mat3_mul_v2_x_loop:
             for(int x =0; x < 3; x++)
             {
-//#pragma HLS unroll
+#pragma HLS unroll
                 mul[y][x] = data[y][x]*c(y, x);
             }
         }
@@ -1153,12 +1153,12 @@ public:
 
     void shift_down(type val)
     {
-//#pragma HLS INLINE
+#pragma HLS INLINE
 
     shift_down_loop:
         for (int i = 0; i < size - 1; i++)
         {
-//#pragma HLS UNROLL
+#pragma HLS UNROLL
 
             data[i] = data[i + 1];
         }
@@ -1175,11 +1175,11 @@ public:
         get_mat2_y_loop:
         for(int y = 0; y < 2; y++)
         {
-//#pragma HLS UNROLL
+#pragma HLS UNROLL
             get_mat2_x_loop:
             for(int x = 0; x < 2; x++)
             {
-//#pragma HLS UNROLL
+#pragma HLS UNROLL
                 mat(y, x) = data[x + width*y];
             }
         }
@@ -1196,11 +1196,11 @@ public:
         get_mat3_y_loop:
         for(int y = 0; y < 3; y++)
         {
-//#pragma HLS UNROLL
+#pragma HLS UNROLL
             get_mat3_x_loop:
             for(int x = 0; x < 3; x++)
             {
-//#pragma HLS UNROLL
+#pragma HLS UNROLL
                 mat(y, x) = data[x + width*y];
             }
         }

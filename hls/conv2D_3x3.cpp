@@ -1,5 +1,6 @@
 #include "conv2D_3x3.h"
 
+
 int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, int &in_width, int &in_height, float weights[3 * 3])
 {
 #pragma HLS INTERFACE axis port = input
@@ -9,7 +10,7 @@ int conv2D_3x3(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output
 #pragma HLS INTERFACE s_axilite port = weights
 #pragma HLS INTERFACE s_axilite port = return
 
-    shift_register<conv_data_type, CONV_MAX_WIDTH * 3> shift_reg;
+    shift_register<conv_data_type, CONV_MAX_WIDTH * 2 + 3> shift_reg;
     // #pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic
     //  #pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
 
@@ -30,22 +31,12 @@ init_kernel_y_loop:
         }
     }
 
-init_buffer_loop:
-    for (int i = 0; i < 3 * in_width; i++)
-    {
-        conv_packet in_packet;
-        input.read(in_packet);
-        conv_data_type in_data = conv_data_type(in_packet.data);
-        shift_reg.shift_down(in_data);
-    }
-
     bool last_was_read = false;
 
-main_loop:
-    for (int i = 0; i < in_width * in_height; i++)
+init_buffer_loop:
+    for (int i = 0; i < 2*CONV_MAX_WIDTH + 3 - in_width - 1; i++)
     {
-// #pragma HLS PIPELINE II=1
-#pragma HLS LOOP_TRIPCOUNT min = 307200 max = 307200
+#pragma HLS LOOP_TRIPCOUNT min = 640 max = 640
 
         conv_data_type in_data = conv_data_type(0.0f);
         if (!last_was_read)
@@ -58,6 +49,13 @@ main_loop:
         }
 
         shift_reg.shift_down(in_data);
+    }
+
+main_loop:
+    for (int i = 0; i < in_width * in_height; i++)
+    {
+// #pragma HLS PIPELINE II=1
+#pragma HLS LOOP_TRIPCOUNT min = 307200 max = 307200
 
         mat3<conv_data_type> data = shift_reg.getMat3(in_width);
         conv_data_type conv = data.mul_v2(kernel);
@@ -70,8 +68,20 @@ main_loop:
             out_packet.last = true;
         else
             out_packet.last = false;
-
+        
         output.write(out_packet);
+
+        conv_data_type in_data = conv_data_type(0.0f);
+        if (!last_was_read)
+        {
+            conv_packet in_packet;
+            input.read(in_packet);
+            in_data = conv_data_type(in_packet.data);
+            if (in_packet.last == 1)
+                last_was_read = true;
+        }
+
+        shift_reg.shift_down(in_data);
     }
 
     return 0;

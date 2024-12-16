@@ -42,6 +42,7 @@ int main(void)
 
     float kernel[3*3] = {0};
 
+/*
     kernel[0] = 1.0;
     kernel[1] = 2.0;
     kernel[2] = 1.0;
@@ -53,9 +54,23 @@ int main(void)
     kernel[6] = -1.0;
     kernel[7] = -2.0;
     kernel[8] = -1.0;
-
+*/
 
 //    kernel[4] = 1.0;
+
+
+    kernel[0] = 0.0;
+    kernel[1] = 1.0;
+    kernel[2] = 0.0;
+
+    kernel[3] = 1.0;
+    kernel[4] = -4.0;
+    kernel[5] = 1.0;
+
+    kernel[6] = 0.0;
+    kernel[7] = 1.0;
+    kernel[8] = 0.0;
+
 /*
     kernel[0] = 1.0/9.0;
     kernel[1] = 1.0/9.0;

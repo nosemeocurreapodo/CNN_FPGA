@@ -37,9 +37,9 @@ class Net(nn.Module):
     def show_debug_data(self, x):
         print("input: ", x)
         x = self.conv1(x)
-        print("after conv1: ", x)
+        #print("after conv1: ", x)
         x = F.relu(x)
-        #print("after relu: ", x)
+        print("after relu: ", x)
         x = self.conv2(x)
         #print("after conv2: ", x)
         x = F.relu(x)

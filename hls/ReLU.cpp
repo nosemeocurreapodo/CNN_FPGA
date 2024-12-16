@@ -1,5 +1,6 @@
 #include "ReLU.h"
 
+
 int ReLU(hls::stream<relu_packet> &input, hls::stream<relu_packet> &output, int &data_size)
 {
 #pragma HLS INTERFACE axis port = input
