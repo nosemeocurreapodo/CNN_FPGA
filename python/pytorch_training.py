@@ -33,6 +33,32 @@ class Net(nn.Module):
         x = self.fc2(x)
         output = F.log_softmax(x, dim=1)
         return output
+    
+    def show_debug_data(self, x):
+        print("input: ", x)
+        x = self.conv1(x)
+        print("after conv1: ", x)
+        x = F.relu(x)
+        #print("after relu: ", x)
+        x = self.conv2(x)
+        #print("after conv2: ", x)
+        x = F.relu(x)
+        #print("after relu: ", x)
+        x = F.max_pool2d(x, 2)
+        #print("after maxpool: ", x)
+        #x = self.dropout1(x)
+        x = torch.flatten(x, 1)
+        #print("after flatten: ", x)
+        x = self.fc1(x)
+        #print("after fc1: ", x)
+        x = F.relu(x)
+        #print("after relu: ", x)
+        #x = self.dropout2(x)
+        x = self.fc2(x)
+        #print("after fc2: ", x)
+        output = F.log_softmax(x, dim=1)
+        #print("output: ", output)
+        return output
 
 
 def train(args, model, device, train_loader, optimizer, epoch):
@@ -71,6 +97,17 @@ def test(model, device, test_loader):
         100. * correct / len(test_loader.dataset)))
 
 
+def debug(model, device, test_loader):
+    model.eval()
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(device), target.to(device)
+            print("target: ", target)
+            output = model.show_debug_data(data)
+            print("output: ", output)
+            break
+
+
 def main():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -96,6 +133,10 @@ def main():
                         help='how many batches to wait before logging training status')
     parser.add_argument('--save-model', action='store_true', default=False,
                         help='For Saving the current Model')
+    parser.add_argument('--load-model', action='store_true', default=False,
+                        help='For Loading the current Model')
+    parser.add_argument('--debug', action='store_true', default=False,
+                        help='For debugging the current Model')
     args = parser.parse_args()
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     use_mps = not args.no_mps and torch.backends.mps.is_available()
@@ -114,7 +155,7 @@ def main():
     if use_cuda:
         cuda_kwargs = {'num_workers': 1,
                        'pin_memory': True,
-                       'shuffle': True}
+                       'shuffle': False}
         train_kwargs.update(cuda_kwargs)
         test_kwargs.update(cuda_kwargs)
 
@@ -133,17 +174,24 @@ def main():
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
     scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-    for epoch in range(1, args.epochs + 1):
-        train(args, model, device, train_loader, optimizer, epoch)
-        test(model, device, test_loader)
-        scheduler.step()
+    
+    if args.load_model:
+        model.load_state_dict(torch.load("mnist_cnn.pt", weights_only=True))
+    else:
+        for epoch in range(1, args.epochs + 1):
+            train(args, model, device, train_loader, optimizer, epoch)
+            test(model, device, test_loader)
+            scheduler.step()
+
+    if args.debug:
+        debug(model, device, test_loader)
 
     if args.save_model:
         #model_scripted = torch.jit.script(model) # Export to TorchScript
         #print(model_scripted)
         #model_scripted.save('model_scripted.pt') # Save
 
-        #torch.save(model.state_dict(), "mnist_cnn.pt")
+        torch.save(model.state_dict(), "mnist_cnn.pt")
         #state_dict = torch.load("mnist_cnn.pt", weights_only=True)
         state_dict = model.state_dict()
         state_dict_numpy = {}
