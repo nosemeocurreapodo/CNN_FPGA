@@ -5,7 +5,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "conv2D_3x3.h"
+#include "conv2D_Nx3x3.h"
 
 typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> packet_type;
 
@@ -42,7 +42,7 @@ int main(void)
         }
     }
 
-    float kernel[3 * 3] = {0};
+    float kernel[2 * 3 * 3] = {0};
 
     /*
         kernel[0] = 1.0;
@@ -58,51 +58,52 @@ int main(void)
         kernel[8] = -1.0;
     */
 
-    //kernel[4] = 1.0;
+    // kernel[4] = 1.0;
 
-    
-        kernel[0] = 0.0;
-        kernel[1] = 1.0;
-        kernel[2] = 0.0;
+    kernel[0] = 0.0;
+    kernel[1] = 1.0;
+    kernel[2] = 0.0;
 
-        kernel[3] = 1.0;
-        kernel[4] = -4.0;
-        kernel[5] = 1.0;
+    kernel[3] = 1.0;
+    kernel[4] = -4.0;
+    kernel[5] = 1.0;
 
-        kernel[6] = 0.0;
-        kernel[7] = 1.0;
-        kernel[8] = 0.0;
-    
-    /*
-        kernel[0] = 1.0/9.0;
-        kernel[1] = 1.0/9.0;
-        kernel[2] = 1.0/9.0;
+    kernel[6] = 0.0;
+    kernel[7] = 1.0;
+    kernel[8] = 0.0;
 
-        kernel[3] = 1.0/9.0;
-        kernel[4] = 1.0/9.0;
-        kernel[5] = 1.0/9.0;
+    kernel[0 + 9] = 1.0 / 9.0;
+    kernel[1 + 9] = 1.0 / 9.0;
+    kernel[2 + 9] = 1.0 / 9.0;
 
-        kernel[6] = 1.0/9.0;
-        kernel[7] = 1.0/9.0;
-        kernel[8] = 1.0/9.0;
-    */
-    conv2D_3x3<float, packet_type, 480, 640>(s_in, s_out, kernel);
+    kernel[3 + 9] = 1.0 / 9.0;
+    kernel[4 + 9] = 1.0 / 9.0;
+    kernel[5 + 9] = 1.0 / 9.0;
 
-    for (int y = 0; y < height; y++)
+    kernel[6 + 9] = 1.0 / 9.0;
+    kernel[7 + 9] = 1.0 / 9.0;
+    kernel[8 + 9] = 1.0 / 9.0;
+
+    conv2D_Nx3x3<float, packet_type, 2, 480, 640>(s_in, s_out, kernel);
+
+    for (int channel = 0; channel < 2; channel++)
     {
-        for (int x = 0; x < width; x++)
+        for (int y = 0; y < height; y++)
         {
-            packet_type out_packet;
-            s_out.read(out_packet);
+            for (int x = 0; x < width; x++)
+            {
+                packet_type out_packet;
+                s_out.read(out_packet);
 
-            outMat.at<float>(y, x) = out_packet.data;
-            diffMat.at<float>(y, x) = fabs(out_packet.data - float(inMat.at<uchar>(y, x)));
-            //diffMat.at<float>(y, x) = float(inMat.at<uchar>(y, x));
+                outMat.at<float>(y, x) = out_packet.data;
+                diffMat.at<float>(y, x) = fabs(out_packet.data - float(inMat.at<uchar>(y, x)));
+                // diffMat.at<float>(y, x) = float(inMat.at<uchar>(y, x));
+            }
         }
     }
 
-    cv::imwrite("conv2D_3x3_filtered.png", outMat);
-    cv::imwrite("conv2D_3x3_diff.png", diffMat);
+    cv::imwrite("conv2d_Nx3x3_filtered.png", outMat);
+    cv::imwrite("conv2d_Nx3x3_diff.png", diffMat);
 
     return 0;
 }

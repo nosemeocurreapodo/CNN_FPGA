@@ -8,7 +8,7 @@
 #include "floatX.h"
 #include "types.h"
 
-template <typename data_type, typename packet_type, int width, int height>
+template <typename data_type, typename packet_type, int height, int width>
 int conv2D_3x3(hls::stream<packet_type> &input, hls::stream<packet_type> &output, float weights[3 * 3])
 {
 #pragma HLS INTERFACE axis port = input
