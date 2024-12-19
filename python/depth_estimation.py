@@ -9,6 +9,7 @@ import numpy as np
 import scipy.io as sio
 import h5py
 import cv2
+import pickle
 
 # Dataset class for NYU Depth V2 loaded from .mat file
 class NYUMatDataset(Dataset):
@@ -148,12 +149,12 @@ class SimpleDepthEstimationNet(nn.Module):
 class UNetDepthEstimator(nn.Module):
     def __init__(self, n_channels=3, n_classes=1):
         super(UNetDepthEstimator, self).__init__()
-        self.inc = DoubleConv(n_channels, 8)
-        self.down1 = Down(8, 16) #112
-        self.down2 = Down(16, 32) #56
-        self.down3 = Down(32, 64) #28
-        self.down4 = Down(64, 128) #14
-        self.down5 = Down(128, 256) #7
+        self.inc = DoubleConv(n_channels, 32) # 224
+        self.down1 = Down(32, 64) #224 112
+        self.down2 = Down(64, 128) #112 56
+        self.down3 = Down(128, 256) #56 28
+        #self.down4 = Down(128, 256) #14 7
+        #self.down5 = Down(128, 256) #7
         
         #self.fc1 = nn.Linear(12544, 128)
         #self.fc2 = nn.Linear(128, 10)
@@ -161,23 +162,23 @@ class UNetDepthEstimator(nn.Module):
         self.up1 = Up(256, 128)
         self.up2 = Up(128, 64)
         self.up3 = Up(64, 32)
-        self.up4 = Up(32, 16)
-        self.up5 = Up(16, 8)
-        self.outc = nn.Conv2d(8, n_classes, kernel_size=1)
+        #self.up4 = Up(32, 16)
+        #self.up5 = Up(16, 8)
+        self.outc = nn.Conv2d(32, n_classes, kernel_size=1)
 
     def forward(self, x):
         x1 = self.inc(x)    # 16
         x2 = self.down1(x1) # 32
         x3 = self.down2(x2) # 64
         x4 = self.down3(x3) # 512
-        x5 = self.down4(x4) # 512
-        x6 = self.down5(x5) # 512
+        #x5 = self.down4(x4) # 512
+        #x6 = self.down5(x5) # 512
         
-        x = self.up1(x6, x5)
-        x = self.up2(x, x4)
-        x = self.up3(x, x3)
-        x = self.up4(x, x2)
-        x = self.up5(x, x1)
+        x = self.up1(x4, x3)
+        x = self.up2(x, x2)
+        x = self.up3(x, x1)
+        #x = self.up4(x, x1)
+        #x = self.up5(x, x1)
         logits = self.outc(x)
         return logits
     
@@ -236,6 +237,18 @@ def train_depth_estimator(model, train_loader, val_loader, epochs=10, lr=1e-3, d
         avg_val_loss = val_loss / len(val_loader)
         print(f"Epoch [{epoch+1}/{epochs}] - Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
         torch.save(model.state_dict(), "depth.pt")
+        
+        state_dict = model.state_dict()
+        state_dict_numpy = {}
+        for key in state_dict:
+            #print(f"{key}: {type(state_dict[key])}")
+            state_dict_numpy[key] = state_dict[key].cpu().detach().numpy().tolist()
+        #print(state_dict_numpy)
+        #print(state_dict)
+        
+        with open("depth.pkl", "wb") as f:
+            pickle.dump(state_dict_numpy, f)
+            
         for images, depths, in val_loader:
             images = images.to(device)
             preds = model(images)
