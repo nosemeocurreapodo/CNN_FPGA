@@ -149,11 +149,11 @@ class SimpleDepthEstimationNet(nn.Module):
 class UNetDepthEstimator(nn.Module):
     def __init__(self, n_channels=3, n_classes=1):
         super(UNetDepthEstimator, self).__init__()
-        self.inc = DoubleConv(n_channels, 32) # 224
-        self.down1 = Down(32, 64) #224 112
-        self.down2 = Down(64, 128) #112 56
-        self.down3 = Down(128, 256) #56 28
-        #self.down4 = Down(128, 256) #14 7
+        self.inc = DoubleConv(n_channels, 16) # 112
+        self.down1 = Down(16, 32) #112 56
+        self.down2 = Down(32, 64) #56 28
+        self.down3 = Down(64, 128) #28 14
+        self.down4 = Down(128, 256) #14 7
         #self.down5 = Down(128, 256) #7
         
         #self.fc1 = nn.Linear(12544, 128)
@@ -162,22 +162,22 @@ class UNetDepthEstimator(nn.Module):
         self.up1 = Up(256, 128)
         self.up2 = Up(128, 64)
         self.up3 = Up(64, 32)
-        #self.up4 = Up(32, 16)
+        self.up4 = Up(32, 16)
         #self.up5 = Up(16, 8)
-        self.outc = nn.Conv2d(32, n_classes, kernel_size=1)
+        self.outc = nn.Conv2d(16, n_classes, kernel_size=1)
 
     def forward(self, x):
         x1 = self.inc(x)    # 16
         x2 = self.down1(x1) # 32
         x3 = self.down2(x2) # 64
         x4 = self.down3(x3) # 512
-        #x5 = self.down4(x4) # 512
+        x5 = self.down4(x4) # 512
         #x6 = self.down5(x5) # 512
         
-        x = self.up1(x4, x3)
-        x = self.up2(x, x2)
-        x = self.up3(x, x1)
-        #x = self.up4(x, x1)
+        x = self.up1(x5, x4)
+        x = self.up2(x, x3)
+        x = self.up3(x, x2)
+        x = self.up4(x, x1)
         #x = self.up5(x, x1)
         logits = self.outc(x)
         return logits
