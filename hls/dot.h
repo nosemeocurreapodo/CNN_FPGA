@@ -12,7 +12,6 @@ int dot(hls::stream<packet_type> &input1, hls::stream<packet_type> &input2, floa
 {
 #pragma HLS INTERFACE axis port = input1
 #pragma HLS INTERFACE axis port = input2
-#pragma HLS INTERFACE s_axilite port = result
 #pragma HLS INTERFACE s_axilite port = in_size
 #pragma HLS INTERFACE s_axilite port = return
 

@@ -7,20 +7,61 @@
 #include "ap_float.h"
 #include "floatX.h"
 
-#define LINEAR_MAX_IN_SIZE 128
-#define LINEAR_MAX_OUT_SIZE 128
+template <typename data_type, typename packet_type, int in_size, int out_size>
+int Linear(hls::stream<packet_type> &weights_s, hls::stream<packet_type> &bias_s, hls::stream<packet_type> &input_s, hls::stream<packet_type> &output_s)
+{
+#pragma HLS INTERFACE axis port = weights_s
+#pragma HLS INTERFACE axis port = bias_s
+#pragma HLS INTERFACE axis port = input_s
+#pragma HLS INTERFACE axis port = output_s
+#pragma HLS INTERFACE s_axilite port = return
 
-// typedef ap_fixed<24, 12, AP_RND> relu_data_type;
-// typedef ap_float<32, 8> relu_data_type;
-// typedef floatX<23, 8> relu_data_type;
-typedef float linear_data_type;
-// typedef half relu_data_type;
-// typedef int relu_data_type;
+    data_type output[out_size];
 
-// typedef ap_axis<32, 2, 5, 6> packet;
-// typedef hls::axis<float, 0, 0, 0> packet;
-// typedef hls::axis_data<float, AXIS_ENABLE_KEEP|AXIS_ENABLE_LAST> packet;
+in_size_loop:
+    for (int i = 0; i < in_size; i++)
+    {
+// #pragma HLS PIPELINE II=1
+#pragma HLS LOOP_TRIPCOUNT min = 12544 max = 12544
 
-typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> linear_packet;
+        packet_type input_packet;
+        input_s.read(input_packet);
+        data_type input = data_type(input_packet.data);
 
-extern int Linear(hls::stream<linear_packet> &input, hls::stream<linear_packet> &output, int &in_size, float weights[LINEAR_MAX_IN_SIZE*LINEAR_MAX_OUT_SIZE], float bias[LINEAR_MAX_OUT_SIZE]);
+    out_size_loop:
+        for (int j = 0; j < out_size; j++)
+        {
+            packet_type weights_packet;
+            weights_s.read(weights_packet);
+            data_type weight = data_type(weights_packet.data);
+
+            data_type mul = weight * input;
+            if (i == 0)
+                output[j] = mul;
+            else
+                output[j] += mul;
+        }
+    }
+
+write_res_loop:
+    for (int i = 0; i < out_size; i++)
+    {
+        packet_type bias_packet;
+        bias_s.read(bias_packet);
+        data_type bias = data_type(bias_packet.data);
+
+        packet_type out_packet;
+        out_packet.data = float(output[i] + bias);
+        out_packet.keep = -1;
+        out_packet.strb = -1;
+
+        if (i == out_size - 1)
+            out_packet.last = true;
+        else
+            out_packet.last = false;
+
+        output_s.write(out_packet);
+    }
+
+    return 0;
+}
