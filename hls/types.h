@@ -480,6 +480,7 @@ struct mat3
 {
     mat3()
     {
+        //#pragma HLS ARRAY_PARTITION variable = data dim = 0 type = complete
     }
 
     mat3(type d00, type d01, type d02, type d10, type d11, type d12, type d20, type d21, type d22)

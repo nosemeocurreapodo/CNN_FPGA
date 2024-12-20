@@ -21,8 +21,9 @@ int conv2D_Nx3x3_2(hls::stream<packet_type> &input, hls::stream<packet_type> &ou
     //  #pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
 
     mat3<data_type> kernel[out_channels];
-#pragma HLS ARRAY_PARTITION variable = kernel.data dim = 0 type = complete
+#pragma HLS ARRAY_PARTITION variable = kernel dim = 0 type = complete
 
+init_out_channel_loop:
     for (int out_channel = 0; out_channel < out_channels; out_channel++)
     {
     init_kernel_y_loop:
