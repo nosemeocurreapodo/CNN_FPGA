@@ -29,20 +29,23 @@ int main(void)
     std::cout << "in_height " << in_height << " in_width " << in_width << std::endl;
     std::cout << "out_height " << out_height << " out_width " << out_width << std::endl;
 
-    cv::Mat outMat[out_channels];
-    cv::Mat diffMat[out_channels];
+    cv::Mat outMat[in_channels][out_channels];
+    cv::Mat diffMat[in_channels][out_channels];
 
-    for (int channel = 0; channel < out_channels; channel++)
+    for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
-        outMat[channel] = cv::Mat(out_height, out_width, CV_32FC1, cv::Scalar(0));
-        diffMat[channel] = cv::Mat(out_height, out_width, CV_32FC1, cv::Scalar(0));
+        for (int out_channel = 0; out_channel < out_channels; out_channel++)
+        {
+            outMat[in_channel][out_channel] = cv::Mat(out_height, out_width, CV_32FC1, cv::Scalar(0));
+            diffMat[in_channel][out_channel] = cv::Mat(out_height, out_width, CV_32FC1, cv::Scalar(0));
+        }
     }
 
     hls::stream<packet_type> s_in;
     hls::stream<packet_type> s_out;
     hls::stream<packet_type> s_kernel;
 
-    float kernel[out_channels * 3 * 3];
+    float kernel[in_channels * out_channels * 3 * 3];
     // identity
     kernel[0] = 0.0;
     kernel[1] = 0.0;
@@ -68,6 +71,7 @@ int main(void)
     kernel[6 + 9] = -1.0;
     kernel[7 + 9] = -2.0;
     kernel[8 + 9] = -1.0;
+
     // laplacian
     kernel[0 + 18] = 0.0;
     kernel[1 + 18] = 1.0;
@@ -81,25 +85,28 @@ int main(void)
     kernel[7 + 18] = 1.0;
     kernel[8 + 18] = 0.0;
 
-    for (int channel = 0; channel < out_channels; channel++)
+    for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
-        for (int y = 0; y < 3; y++)
+        for (int out_channel = 0; out_channel < out_channels; out_channel++)
         {
-            for (int x = 0; x < 3; x++)
+            for (int y = 0; y < 3; y++)
             {
-                packet_type in_packet;
+                for (int x = 0; x < 3; x++)
+                {
+                    packet_type in_packet;
 
-                in_packet.data = kernel[x + y * 3 + channel * 9];
-                in_packet.last = false;
-                in_packet.keep = -1;
-                if (x == 3 - 1 && y == 3 - 1 && channel == in_channels - 1)
-                    in_packet.last = true;
-                s_kernel.write(in_packet);
+                    in_packet.data = kernel[x + y * 3 + out_channel * 9 + in_channel * out_channels * 9];
+                    in_packet.last = false;
+                    in_packet.keep = -1;
+                    if (x == 3 - 1 && y == 3 - 1 && in_channel == in_channels - 1 && out_channel == out_channels - 1)
+                        in_packet.last = true;
+                    s_kernel.write(in_packet);
+                }
             }
         }
     }
 
-    for (int channel = 0; channel < in_channels; channel++)
+    for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
         for (int y = 0; y < in_height; y++)
         {
@@ -110,34 +117,37 @@ int main(void)
                 in_packet.data = float(inMat.at<uchar>(y, x));
                 in_packet.last = false;
                 in_packet.keep = -1;
-                if (x == in_width - 1 && y == in_height - 1 && channel == in_channels - 1)
+                if (x == in_width - 1 && y == in_height - 1 && in_channel == in_channels - 1)
                     in_packet.last = true;
                 s_in.write(in_packet);
             }
         }
     }
 
-    conv2D_3x3<float, packet_type, 3, 480, 640, 1>(s_in, s_out, s_kernel);
+    conv2D_3x3<float, packet_type, 1, 480, 640, 3, 1>(s_in, s_out, s_kernel);
 
-    for (int y = 0; y < out_height; y++)
+    for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
-        for (int x = 0; x < out_width; x++)
+        for (int y = 0; y < out_height; y++)
         {
-            for (int channel = 0; channel < out_channels; channel++)
+            for (int x = 0; x < out_width; x++)
             {
-                packet_type out_packet;
-                s_out.read(out_packet);
-                float data = out_packet.data;
+                for (int out_channel = 0; out_channel < out_channels; out_channel++)
+                {
+                    packet_type out_packet;
+                    s_out.read(out_packet);
+                    float data = out_packet.data;
 
-                outMat[channel].at<float>(y, x) = data;
-                diffMat[channel].at<float>(y, x) = fabs(data - float(inMat.at<uchar>(y + 1 - padding, x + 1 - padding)));
-                // diffMat.at<float>(y, x) = float(inMat.at<uchar>(y + 1 - padding, x + 1 - padding));
+                    outMat[in_channel][out_channel].at<float>(y, x) = data;
+                    diffMat[in_channel][out_channel].at<float>(y, x) = fabs(data - float(inMat.at<uchar>(y + 1 - padding, x + 1 - padding)));
+                    // diffMat.at<float>(y, x) = float(inMat.at<uchar>(y + 1 - padding, x + 1 - padding));
+                }
             }
         }
     }
 
-    cv::imwrite("conv2D_Nx3x3_2_filtered.png", outMat[1]);
-    cv::imwrite("conv2D_Nx3x3_2_diff.png", diffMat[1]);
+    cv::imwrite("conv2D_Nx3x3_2_filtered.png", outMat[0][1]);
+    cv::imwrite("conv2D_Nx3x3_2_diff.png", diffMat[0][1]);
 
     return 0;
 }
