@@ -84,7 +84,10 @@ main_in_channel_loop:
 
                     if (x >= 2 - padding && y >= 2 - padding)
                     {
-                        output_data[y - 2 + padding][x - 2 + padding][out_channel] += conv;
+                        if(in_channel == 0)
+                            output_data[y - 2 + padding][x - 2 + padding][out_channel] = conv;
+                        else
+                            output_data[y - 2 + padding][x - 2 + padding][out_channel] += conv;
                     }
                 }
             }
