@@ -80,7 +80,7 @@ main_in_channel_loop:
                     out_packet.data = float(conv);
                     out_packet.keep = -1;
                     out_packet.strb = -1;
-                    if (x == width + padding - 1 && y == height + padding - 1 && out_channel == out_channels - 1)
+                    if (x == width + padding - 1 && y == height + padding - 1 && in_channel == in_channels - 1 && out_channel == out_channels - 1)
                         out_packet.last = true;
                     else
                         out_packet.last = false;

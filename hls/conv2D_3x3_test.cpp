@@ -7,6 +7,10 @@
 
 #include "conv2D_3x3.h"
 
+#define IN_CHANNELS 3
+#define OUT_CHANNELS 1
+#define PADDING 1
+
 typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> packet_type;
 
 int main(void)
@@ -18,23 +22,19 @@ int main(void)
 
     int in_width = inMat.cols;
     int in_height = inMat.rows;
-    int in_channels = 1;
 
-    int padding = 1;
-
-    int out_width = in_width - 2 + padding * 2;
-    int out_height = in_height - 2 + padding * 2;
-    int out_channels = 3;
+    int out_width = in_width - 2 + PADDING * 2;
+    int out_height = in_height - 2 + PADDING * 2;
 
     std::cout << "in_height " << in_height << " in_width " << in_width << std::endl;
     std::cout << "out_height " << out_height << " out_width " << out_width << std::endl;
 
-    cv::Mat outMat[in_channels][out_channels];
-    cv::Mat diffMat[in_channels][out_channels];
+    cv::Mat outMat[IN_CHANNELS][OUT_CHANNELS];
+    cv::Mat diffMat[IN_CHANNELS][OUT_CHANNELS];
 
-    for (int in_channel = 0; in_channel < in_channels; in_channel++)
+    for (int in_channel = 0; in_channel < IN_CHANNELS; in_channel++)
     {
-        for (int out_channel = 0; out_channel < out_channels; out_channel++)
+        for (int out_channel = 0; out_channel < OUT_CHANNELS; out_channel++)
         {
             outMat[in_channel][out_channel] = cv::Mat(out_height, out_width, CV_32FC1, cv::Scalar(0));
             diffMat[in_channel][out_channel] = cv::Mat(out_height, out_width, CV_32FC1, cv::Scalar(0));
@@ -45,7 +45,7 @@ int main(void)
     hls::stream<packet_type> s_out;
     hls::stream<packet_type> s_kernel;
 
-    float kernel[in_channels * out_channels * 3 * 3];
+    float kernel[IN_CHANNELS * OUT_CHANNELS * 3 * 3];
     // identity
     kernel[0] = 0.0;
     kernel[1] = 0.0;
@@ -85,9 +85,9 @@ int main(void)
     kernel[7 + 18] = 1.0;
     kernel[8 + 18] = 0.0;
 
-    for (int in_channel = 0; in_channel < in_channels; in_channel++)
+    for (int in_channel = 0; in_channel < IN_CHANNELS; in_channel++)
     {
-        for (int out_channel = 0; out_channel < out_channels; out_channel++)
+        for (int out_channel = 0; out_channel < OUT_CHANNELS; out_channel++)
         {
             for (int y = 0; y < 3; y++)
             {
@@ -95,10 +95,10 @@ int main(void)
                 {
                     packet_type in_packet;
 
-                    in_packet.data = kernel[x + y * 3 + out_channel * 9 + in_channel * out_channels * 9];
+                    in_packet.data = kernel[x + y * 3 + out_channel * 9 + in_channel * OUT_CHANNELS * 9];
                     in_packet.last = false;
                     in_packet.keep = -1;
-                    if (x == 3 - 1 && y == 3 - 1 && in_channel == in_channels - 1 && out_channel == out_channels - 1)
+                    if (x == 3 - 1 && y == 3 - 1 && in_channel == IN_CHANNELS - 1 && out_channel == OUT_CHANNELS - 1)
                         in_packet.last = true;
                     s_kernel.write(in_packet);
                 }
@@ -106,7 +106,7 @@ int main(void)
         }
     }
 
-    for (int in_channel = 0; in_channel < in_channels; in_channel++)
+    for (int in_channel = 0; in_channel < IN_CHANNELS; in_channel++)
     {
         for (int y = 0; y < in_height; y++)
         {
@@ -117,37 +117,37 @@ int main(void)
                 in_packet.data = float(inMat.at<uchar>(y, x));
                 in_packet.last = false;
                 in_packet.keep = -1;
-                if (x == in_width - 1 && y == in_height - 1 && in_channel == in_channels - 1)
+                if (x == in_width - 1 && y == in_height - 1 && in_channel == IN_CHANNELS - 1)
                     in_packet.last = true;
                 s_in.write(in_packet);
             }
         }
     }
 
-    conv2D_3x3<float, packet_type, 1, 480, 640, 3, 1>(s_in, s_out, s_kernel);
+    conv2D_3x3<float, packet_type, IN_CHANNELS, OUT_CHANNELS, 480, 640, PADDING>(s_in, s_out, s_kernel);
 
-    for (int in_channel = 0; in_channel < in_channels; in_channel++)
+    for (int in_channel = 0; in_channel < IN_CHANNELS; in_channel++)
     {
         for (int y = 0; y < out_height; y++)
         {
             for (int x = 0; x < out_width; x++)
             {
-                for (int out_channel = 0; out_channel < out_channels; out_channel++)
+                for (int out_channel = 0; out_channel < OUT_CHANNELS; out_channel++)
                 {
                     packet_type out_packet;
                     s_out.read(out_packet);
                     float data = out_packet.data;
 
                     outMat[in_channel][out_channel].at<float>(y, x) = data;
-                    diffMat[in_channel][out_channel].at<float>(y, x) = fabs(data - float(inMat.at<uchar>(y + 1 - padding, x + 1 - padding)));
+                    diffMat[in_channel][out_channel].at<float>(y, x) = fabs(data - float(inMat.at<uchar>(y + 1 - PADDING, x + 1 - PADDING)));
                     // diffMat.at<float>(y, x) = float(inMat.at<uchar>(y + 1 - padding, x + 1 - padding));
                 }
             }
         }
     }
 
-    cv::imwrite("conv2D_Nx3x3_2_filtered.png", outMat[0][1]);
-    cv::imwrite("conv2D_Nx3x3_2_diff.png", diffMat[0][1]);
+    cv::imwrite("conv2D_3x3_filtered.png", outMat[0][0]);
+    cv::imwrite("conv2D_3x3_diff.png", diffMat[0][0]);
 
     return 0;
 }

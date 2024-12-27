@@ -7,7 +7,7 @@
 #include "ap_float.h"
 #include "floatX.h"
 #include "types.h"
-#include "conv2D_3x3.h"
+#include "conv2D_3x3_new.h"
 
 // typedef ap_axis<32, 2, 5, 6> packet;
 // typedef hls::axis<float, 0, 0, 0> packet;
@@ -15,4 +15,4 @@
 
 typedef hls::axis<float, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false> conv_packet;
 
-extern int conv2D_3x3_1x8x28x28(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, hls::stream<conv_packet> &weights);
+extern int conv2D_3x3_new_8x1x28x28(hls::stream<conv_packet> &input, hls::stream<conv_packet> &output, hls::stream<conv_packet> &weights);

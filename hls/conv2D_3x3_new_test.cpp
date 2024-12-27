@@ -121,7 +121,7 @@ int main(void)
         }
     }
 
-    conv2D_3x3<float, packet_type, IN_CHANNELS, OUT_CHANNELS, 480, 640, PADDING>(s_in, s_out, s_kernel);
+    conv2D_3x3_new<float, packet_type, IN_CHANNELS, OUT_CHANNELS, 480, 640, PADDING>(s_in, s_out, s_kernel);
 
     for (int out_channel = 0; out_channel < OUT_CHANNELS; out_channel++)
     {

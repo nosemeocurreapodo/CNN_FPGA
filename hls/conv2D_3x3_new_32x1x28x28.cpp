@@ -7,5 +7,5 @@ int conv2D_3x3_new_32x1x28x28(hls::stream<conv_packet> &input, hls::stream<conv_
 #pragma HLS INTERFACE mode=axis register_mode=both port=weights
 #pragma HLS INTERFACE s_axilite port = return
 
-    return conv2D_3x3<float, conv_packet, 32, 1, 28, 28, 1>(input, output, weights);
+    return conv2D_3x3_new<float, conv_packet, 32, 1, 28, 28, 1>(input, output, weights);
 }

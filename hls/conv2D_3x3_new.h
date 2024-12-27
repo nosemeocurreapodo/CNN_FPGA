@@ -9,7 +9,7 @@
 #include "types.h"
 
 template <typename data_type, typename packet_type, int in_channels, int out_channels, int in_height, int in_width, int padding>
-int conv2D_3x3(hls::stream<packet_type> &input, hls::stream<packet_type> &output, hls::stream<packet_type> &weights)
+int conv2D_3x3_new(hls::stream<packet_type> &input, hls::stream<packet_type> &output, hls::stream<packet_type> &weights)
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
@@ -20,7 +20,7 @@ int conv2D_3x3(hls::stream<packet_type> &input, hls::stream<packet_type> &output
     const int out_width = in_width + padding * 2 - 2;
 
     data_type output_data[out_height][out_width][out_channels]; // = {data_type(0.0)};
-#pragma HLS ARRAY_PARTITION variable=output_data dim=3 type=complete 
+//#pragma HLS ARRAY_PARTITION variable=output_data dim=3 type=complete 
 
     shift_mat3<data_type, in_width + padding * 2> shift_reg;
     // #pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic
