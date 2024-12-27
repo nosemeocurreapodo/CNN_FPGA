@@ -20,7 +20,7 @@ int conv2D_3x3_new(hls::stream<packet_type> &input, hls::stream<packet_type> &ou
     const int out_width = in_width + padding * 2 - 2;
 
     data_type output_data[out_height][out_width][out_channels]; // = {data_type(0.0)};
-//#pragma HLS ARRAY_PARTITION variable=output_data dim=3 type=complete 
+                                                                // #pragma HLS ARRAY_PARTITION variable=output_data dim=3 type=complete
 
     shift_mat3<data_type, in_width + padding * 2> shift_reg;
     // #pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic
@@ -29,11 +29,11 @@ int conv2D_3x3_new(hls::stream<packet_type> &input, hls::stream<packet_type> &ou
     mat3<data_type> kernel[in_channels][out_channels];
 #pragma HLS ARRAY_PARTITION variable = kernel dim = 0 type = complete
 
-init_in_channel_loop:
-    for (int in_channel = 0; in_channel < in_channels; in_channel++)
+init_out_channel_loop:
+    for (int out_channel = 0; out_channel < out_channels; out_channel++)
     {
-    init_out_channel_loop:
-        for (int out_channel = 0; out_channel < out_channels; out_channel++)
+    init_in_channel_loop:
+        for (int in_channel = 0; in_channel < in_channels; in_channel++)
         {
         init_kernel_y_loop:
             for (int y = 0; y < 3; y++)
@@ -84,7 +84,7 @@ main_in_channel_loop:
 
                     if (x >= 2 - padding && y >= 2 - padding)
                     {
-                        if(in_channel == 0)
+                        if (in_channel == 0)
                             output_data[y - 2 + padding][x - 2 + padding][out_channel] = conv;
                         else
                             output_data[y - 2 + padding][x - 2 + padding][out_channel] += conv;

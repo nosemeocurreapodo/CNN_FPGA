@@ -23,11 +23,11 @@ int conv2D_3x3(hls::stream<packet_type> &input, hls::stream<packet_type> &output
     mat3<data_type> kernel[in_channels][out_channels];
 #pragma HLS ARRAY_PARTITION variable = kernel dim = 0 type = complete
 
-init_in_channel_loop:
-    for (int in_channel = 0; in_channel < in_channels; in_channel++)
+init_out_channel_loop:
+    for (int out_channel = 0; out_channel < out_channels; out_channel++)
     {
-    init_out_channel_loop:
-        for (int out_channel = 0; out_channel < out_channels; out_channel++)
+    init_in_channel_loop:
+        for (int in_channel = 0; in_channel < in_channels; in_channel++)
         {
         init_kernel_y_loop:
             for (int y = 0; y < 3; y++)
