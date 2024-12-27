@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Dec 27 12:52:12 2024" VIVADOVERSION="2024.2">
+<EDKSYSTEM EDWVERSION="1.2" TIMESTAMP="Fri Dec 27 14:18:16 2024" VIVADOVERSION="2024.2">
 
   <SYSTEMINFO ARCH="zynq" BOARD="tul.com.tw:pynq-z2:part0:1.0" DEVICE="7z020" NAME="design_1" PACKAGE="clg400" SPEEDGRADE="-1"/>
 
@@ -3320,27 +3320,27 @@
         </PORT>
         <PORT DIR="O" LEFT="31" NAME="m_axis_mm2s_tdata" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TDATA"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TDATA"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="3" NAME="m_axis_mm2s_tkeep" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tkeep">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TKEEP"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TKEEP"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axis_mm2s_tlast" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TLAST"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TLAST"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axis_mm2s_tready" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TREADY"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TREADY"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axis_mm2s_tvalid" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TVALID"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TVALID"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="mm2s_introut" SENSITIVITY="LEVEL_HIGH" SIGIS="INTERRUPT"/>
@@ -5743,27 +5743,27 @@
         </PORT>
         <PORT DIR="O" LEFT="31" NAME="m_axis_mm2s_tdata" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TDATA"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TDATA"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" LEFT="3" NAME="m_axis_mm2s_tkeep" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tkeep">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TKEEP"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TKEEP"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axis_mm2s_tlast" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TLAST"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TLAST"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="I" NAME="m_axis_mm2s_tready" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TREADY"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TREADY"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="m_axis_mm2s_tvalid" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="input_r_TVALID"/>
+            <CONNECTION INSTANCE="conv2D_3x3_1x32x28x28" PORT="weights_TVALID"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="mm2s_introut" SENSITIVITY="LEVEL_HIGH" SIGIS="INTERRUPT"/>
@@ -30772,29 +30772,29 @@
             <CONNECTION INSTANCE="rst_ps7_0_100M" PORT="peripheral_aresetn"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="31" NAME="input_r_TDATA" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tdata">
+        <PORT DIR="I" LEFT="31" NAME="input_r_TDATA" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tdata"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tdata"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="3" NAME="input_r_TKEEP" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tkeep">
+        <PORT DIR="I" LEFT="3" NAME="input_r_TKEEP" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tkeep">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tkeep"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tkeep"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="0" NAME="input_r_TLAST" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tlast">
+        <PORT DIR="I" LEFT="0" NAME="input_r_TLAST" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tlast"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tlast"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="input_r_TREADY" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tready">
+        <PORT DIR="O" NAME="input_r_TREADY" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tready"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="input_r_TVALID" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tvalid">
+        <PORT DIR="I" NAME="input_r_TVALID" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tvalid"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tvalid"/>
           </CONNECTIONS>
         </PORT>
         <PORT DIR="O" NAME="interrupt" SENSITIVITY="LEVEL_HIGH" SIGIS="INTERRUPT"/>
@@ -30908,29 +30908,29 @@
             <CONNECTION INSTANCE="axi_smc" PORT="M20_AXI_wvalid"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="31" NAME="weights_TDATA" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tdata">
+        <PORT DIR="I" LEFT="31" NAME="weights_TDATA" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tdata">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tdata"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tdata"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="3" NAME="weights_TKEEP" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tkeep">
+        <PORT DIR="I" LEFT="3" NAME="weights_TKEEP" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tkeep">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tkeep"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tkeep"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" LEFT="0" NAME="weights_TLAST" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tlast">
+        <PORT DIR="I" LEFT="0" NAME="weights_TLAST" RIGHT="0" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tlast">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tlast"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tlast"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="O" NAME="weights_TREADY" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tready">
+        <PORT DIR="O" NAME="weights_TREADY" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tready">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tready"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tready"/>
           </CONNECTIONS>
         </PORT>
-        <PORT DIR="I" NAME="weights_TVALID" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_input_m_axis_mm2s_tvalid">
+        <PORT DIR="I" NAME="weights_TVALID" SIGIS="undef" SIGNAME="axi_dma_conv2d_1x32x28x28_weights_m_axis_mm2s_tvalid">
           <CONNECTIONS>
-            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_input" PORT="m_axis_mm2s_tvalid"/>
+            <CONNECTION INSTANCE="axi_dma_conv2d_1x32x28x28_weights" PORT="m_axis_mm2s_tvalid"/>
           </CONNECTIONS>
         </PORT>
       </PORTS>
@@ -30987,7 +30987,7 @@
             <PORTMAP LOGICAL="WVALID" PHYSICAL="s_axi_control_WVALID"/>
           </PORTMAPS>
         </BUSINTERFACE>
-        <BUSINTERFACE BUSNAME="axi_dma_conv2d_1x32x28x28_weights_M_AXIS_MM2S" NAME="input_r" TYPE="TARGET" VLNV="xilinx.com:interface:axis:1.0">
+        <BUSINTERFACE BUSNAME="axi_dma_conv2d_1x32x28x28_input_M_AXIS_MM2S" NAME="input_r" TYPE="TARGET" VLNV="xilinx.com:interface:axis:1.0">
           <PARAMETER NAME="CLK_DOMAIN" VALUE="design_1_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_TKEEP" VALUE="1"/>
@@ -31031,7 +31031,7 @@
             <PORTMAP LOGICAL="TVALID" PHYSICAL="output_r_TVALID"/>
           </PORTMAPS>
         </BUSINTERFACE>
-        <BUSINTERFACE BUSNAME="axi_dma_conv2d_1x32x28x28_input_M_AXIS_MM2S" NAME="weights" TYPE="TARGET" VLNV="xilinx.com:interface:axis:1.0">
+        <BUSINTERFACE BUSNAME="axi_dma_conv2d_1x32x28x28_weights_M_AXIS_MM2S" NAME="weights" TYPE="TARGET" VLNV="xilinx.com:interface:axis:1.0">
           <PARAMETER NAME="CLK_DOMAIN" VALUE="design_1_processing_system7_0_0_FCLK_CLK0"/>
           <PARAMETER NAME="FREQ_HZ" VALUE="100000000"/>
           <PARAMETER NAME="HAS_TKEEP" VALUE="1"/>
