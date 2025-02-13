@@ -7,8 +7,8 @@
 #include "ap_float.h"
 #include "floatX.h"
 
-template <typename data_type, typename packet_type, int in_size, int out_size>
-int Linear(hls::stream<packet_type> &weights_s, hls::stream<packet_type> &bias_s, hls::stream<packet_type> &input_s, hls::stream<packet_type> &output_s)
+template <typename weight_type, typename weight_packet, typename bias_type, typename bias_packet, typename input_type, typename input_packet, typename output_type, typedef output_packet, int in_size, int out_size>
+int Linear(hls::stream<weight_packet> &weights_s, hls::stream<bias_packet> &bias_s, hls::stream<input_packet> &input_s, hls::stream<output_packet> &output_s)
 {
 #pragma HLS INTERFACE axis port = weights_s
 #pragma HLS INTERFACE axis port = bias_s
@@ -16,7 +16,7 @@ int Linear(hls::stream<packet_type> &weights_s, hls::stream<packet_type> &bias_s
 #pragma HLS INTERFACE axis port = output_s
 #pragma HLS INTERFACE s_axilite port = return
 
-    data_type output[out_size];
+    output_type output[out_size];
 
 in_size_loop:
     for (int i = 0; i < in_size; i++)
@@ -24,18 +24,18 @@ in_size_loop:
 // #pragma HLS PIPELINE II=1
 #pragma HLS LOOP_TRIPCOUNT min = 12544 max = 12544
 
-        packet_type input_packet;
+        hls::axis<input_type, 0, 0, 0> input_packet;
         input_s.read(input_packet);
-        data_type input = data_type(input_packet.data);
+        input_type input = data_type(input_packet.data);
 
     out_size_loop:
         for (int j = 0; j < out_size; j++)
         {
-            packet_type weights_packet;
+            hls::axis<weight_type, 0, 0, 0> weights_packet;
             weights_s.read(weights_packet);
-            data_type weight = data_type(weights_packet.data);
+            weight_type weight = data_type(weights_packet.data);
 
-            data_type mul = weight * input;
+            output_type mul = weight * input;
             if (i == 0)
                 output[j] = mul;
             else
@@ -46,11 +46,11 @@ in_size_loop:
 write_res_loop:
     for (int i = 0; i < out_size; i++)
     {
-        packet_type bias_packet;
+        hls::axis<bias_type, 0, 0, 0> bias_packet;
         bias_s.read(bias_packet);
-        data_type bias = data_type(bias_packet.data);
+        bias_type bias = data_type(bias_packet.data);
 
-        packet_type out_packet;
+        output_type out_packet;
         out_packet.data = float(output[i] + bias);
         out_packet.keep = -1;
         out_packet.strb = -1;
