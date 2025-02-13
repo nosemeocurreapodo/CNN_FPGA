@@ -8,7 +8,7 @@
 #include "floatX.h"
 
 template <typename data_type, typename packet_type>
-int ReLU(hls::stream<packet_type> &input, hls::stream<packet_type> &output, int &data_size)
+int ReLU_base(hls::stream<packet_type> &input, hls::stream<packet_type> &output, int &data_size)
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output

@@ -635,11 +635,12 @@ struct mat3
         return result;
     }
 
-    type mul_v2(mat3<type> c)
+    template <typename output_type, typename input_type>
+    output_type mul_v2(mat3<input_type> c)
 	{
 //#pragma HLS INLINE
 
-        type mul[3][3];
+        output_type mul[3][3];
 //#pragma HLS ARRAY_PARTITION variable = mul complete dim = 0
 
         mat3_mul_v2_y_loop:
@@ -650,21 +651,21 @@ struct mat3
             for(int x =0; x < 3; x++)
             {
 #pragma HLS unroll
-                mul[y][x] = data[y][x]*c(y, x);
+                mul[y][x] = output_type(data[y][x])*output_type(c(y, x));
             }
         }
 
-		type sum_lvl1_0  = mul[0][0] + mul[1][0];
-		type sum_lvl1_1  = mul[0][1] + mul[1][1];
-		type sum_lvl1_2  = mul[0][2] + mul[1][2];
+		output_type sum_lvl1_0  = mul[0][0] + mul[1][0];
+		output_type sum_lvl1_1  = mul[0][1] + mul[1][1];
+		output_type sum_lvl1_2  = mul[0][2] + mul[1][2];
 
-		type sum_lvl2_0  = mul[2][0] + sum_lvl1_0;
-		type sum_lvl2_1  = mul[2][1] + sum_lvl1_1;
-		type sum_lvl2_2  = mul[2][2] + sum_lvl1_2;
+		output_type sum_lvl2_0  = mul[2][0] + sum_lvl1_0;
+		output_type sum_lvl2_1  = mul[2][1] + sum_lvl1_1;
+		output_type sum_lvl2_2  = mul[2][2] + sum_lvl1_2;
 
-		type sum_lvl3_0 = sum_lvl2_0  + sum_lvl2_1;
+		output_type sum_lvl3_0 = sum_lvl2_0  + sum_lvl2_1;
 
-        type res = sum_lvl3_0 + sum_lvl2_2;
+        output_type res = sum_lvl3_0 + sum_lvl2_2;
 
 		return res;
 	}
