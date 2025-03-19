@@ -50,6 +50,53 @@ class Conv1x1_ReLU_BN(nn.Module):
         return self.latency
 
 
+class Conv1x1_ReLU_2_2(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.op = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1,
+                            padding=0)
+
+        self.register_buffer('latency', torch.tensor(0.1))
+
+    def forward(self, x):
+        # return F.relu(self.op(x))
+
+        x = fake_quantization.fake_fixed_truncate(x,
+                                                  2,
+                                                  0,
+                                                  0)
+
+        if hasattr(self.op, 'weight') and self.op.weight is not None:
+            w = fake_quantization.fake_fixed_truncate(self.op.weight,
+                                                      2,
+                                                      0,
+                                                      0)
+        else:
+            w = None
+
+        if hasattr(self.op, 'bias') and self.op.bias is not None:
+            b = fake_quantization.fake_fixed_truncate(self.op.bias,
+                                                      2,
+                                                      0,
+                                                      0)
+        else:
+            b = None
+
+        if isinstance(self.op, nn.Conv2d):
+            x = F.conv2d(x, w, b,
+                         stride=self.op.stride,
+                         padding=self.op.padding,
+                         dilation=self.op.dilation,
+                         groups=self.op.groups)
+        elif isinstance(self.op, nn.Linear):
+            x = F.linear(x, w, b)
+
+        return F.relu(x)
+
+    def getLatency(self):
+        return self.latency
+
+
 class Conv1x1_ReLU_4_4(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
@@ -84,10 +131,10 @@ class Conv1x1_ReLU_4_4(nn.Module):
 
         if isinstance(self.op, nn.Conv2d):
             x = F.conv2d(x, w, b,
-                           stride=self.op.stride,
-                           padding=self.op.padding,
-                           dilation=self.op.dilation,
-                           groups=self.op.groups)
+                         stride=self.op.stride,
+                         padding=self.op.padding,
+                         dilation=self.op.dilation,
+                         groups=self.op.groups)
         elif isinstance(self.op, nn.Linear):
             x = F.linear(x, w, b)
 
@@ -176,10 +223,10 @@ class Conv3x3_ReLU_2_2(nn.Module):
 
         if isinstance(self.op, nn.Conv2d):
             x = F.conv2d(x, w, b,
-                           stride=self.op.stride,
-                           padding=self.op.padding,
-                           dilation=self.op.dilation,
-                           groups=self.op.groups)
+                         stride=self.op.stride,
+                         padding=self.op.padding,
+                         dilation=self.op.dilation,
+                         groups=self.op.groups)
         elif isinstance(self.op, nn.Linear):
             x = F.linear(x, w, b)
 
@@ -223,10 +270,10 @@ class Conv3x3_ReLU_4_4(nn.Module):
 
         if isinstance(self.op, nn.Conv2d):
             x = F.conv2d(x, w, b,
-                           stride=self.op.stride,
-                           padding=self.op.padding,
-                           dilation=self.op.dilation,
-                           groups=self.op.groups)
+                         stride=self.op.stride,
+                         padding=self.op.padding,
+                         dilation=self.op.dilation,
+                         groups=self.op.groups)
         elif isinstance(self.op, nn.Linear):
             x = F.linear(x, w, b)
 
@@ -431,19 +478,40 @@ class VerySimpleDARTSNetwork(nn.Module):
     def __init__(self, num_classes=10, input_shape=(1, 32, 32)):
         super().__init__()
 
-        op_candidates_1 = [Conv1x1_ReLU, Conv3x3_ReLU]
+        op_candidates_1 = [Conv1x1_ReLU, Conv3x3_ReLU,
+                           Conv1x1_ReLU_BN, Conv3x3_ReLU_BN,
+                           Conv1x1_ReLU_2_2, Conv3x3_ReLU_2_2,
+                           Conv1x1_ReLU_4_4, Conv3x3_ReLU_4_4]
         self.mixed_op_1 = MixedOp(input_shape[0], 32, op_candidates_1)
-        op_candidates_2 = [Conv1x1_ReLU, Conv3x3_ReLU]
+        op_candidates_2 = [Conv1x1_ReLU, Conv3x3_ReLU,
+                           Conv1x1_ReLU_BN, Conv3x3_ReLU_BN,
+                           Conv1x1_ReLU_2_2, Conv3x3_ReLU_2_2,
+                           Conv1x1_ReLU_4_4, Conv3x3_ReLU_4_4,
+                           NoConv]
         self.mixed_op_2 = MixedOp(32, 32, op_candidates_2)
 
-        op_candidates_3 = [Conv1x1_ReLU, Conv3x3_ReLU]
+        op_candidates_3 = [Conv1x1_ReLU, Conv3x3_ReLU,
+                           Conv1x1_ReLU_BN, Conv3x3_ReLU_BN,
+                           Conv1x1_ReLU_2_2, Conv3x3_ReLU_2_2,
+                           Conv1x1_ReLU_4_4, Conv3x3_ReLU_4_4]
         self.mixed_op_3 = MixedOp(32, 64, op_candidates_3)
-        op_candidates_4 = [Conv1x1_ReLU, Conv3x3_ReLU]
+        op_candidates_4 = [Conv1x1_ReLU, Conv3x3_ReLU,
+                           Conv1x1_ReLU_BN, Conv3x3_ReLU_BN,
+                           Conv1x1_ReLU_2_2, Conv3x3_ReLU_2_2,
+                           Conv1x1_ReLU_4_4, Conv3x3_ReLU_4_4,
+                           NoConv]
         self.mixed_op_4 = MixedOp(64, 64, op_candidates_4)
 
-        op_candidates_5 = [Conv1x1_ReLU, Conv3x3_ReLU]
+        op_candidates_5 = [Conv1x1_ReLU, Conv3x3_ReLU,
+                           Conv1x1_ReLU_BN, Conv3x3_ReLU_BN,
+                           Conv1x1_ReLU_2_2, Conv3x3_ReLU_2_2,
+                           Conv1x1_ReLU_4_4, Conv3x3_ReLU_4_4]
         self.mixed_op_5 = MixedOp(64, 128, op_candidates_5)
-        op_candidates_6 = [Conv1x1_ReLU, Conv3x3_ReLU]
+        op_candidates_6 = [Conv1x1_ReLU, Conv3x3_ReLU,
+                           Conv1x1_ReLU_BN, Conv3x3_ReLU_BN,
+                           Conv1x1_ReLU_2_2, Conv3x3_ReLU_2_2,
+                           Conv1x1_ReLU_4_4, Conv3x3_ReLU_4_4,
+                           NoConv]
         self.mixed_op_6 = MixedOp(128, 128, op_candidates_6)
 
         self.fc1 = nn.Linear(128 * input_shape[1]//8 * input_shape[2]//8, 256)

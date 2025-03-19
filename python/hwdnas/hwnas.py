@@ -17,8 +17,8 @@ def main():
     device = torch.device("cuda" if use_cuda else "cpu")
     print("using divice ", device)
 
-    # dataset = load_dataset.mnist_dataset(batch_size)
-    dataset = load_dataset.cifar10_dataset(batch_size)
+    dataset = load_dataset.mnist_dataset(batch_size)
+    # dataset = load_dataset.cifar10_dataset(batch_size)
     train_data_loader = dataset.train_loader
     test_data_loader = dataset.test_loader
 
@@ -49,7 +49,7 @@ def main():
     # if (len(arch_params) > 0):
     #    optimizer_alpha = optim.Adam(arch_params, lr=0.001)
 
-    all_params = model.named_parameters()
+    all_params = model.parameters()
     optimizer_all = optim.Adam(all_params, lr=0.001)
 
     criterion = nn.CrossEntropyLoss()
