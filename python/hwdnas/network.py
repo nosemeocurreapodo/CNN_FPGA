@@ -432,44 +432,38 @@ class VerySimpleDARTSNetwork(nn.Module):
         super().__init__()
         
         op_candidates_1 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
-                           Conv1x1_ReLU_4_4,
-                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
-                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
-                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN]
+                           # Conv1x1_ReLU_4_4,
+                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN],
+                           # Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4]
         self.mixed_op_1 = MixedOp(input_shape[0], 32, op_candidates_1)
         op_candidates_2 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
-                           Conv1x1_ReLU_4_4,
+                           # Conv1x1_ReLU_4_4,
                            Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
-                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
-                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN,
+                           # Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
                            NoConv]
         self.mixed_op_2 = MixedOp(32, 32, op_candidates_2)
         
         op_candidates_3 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
-                           Conv1x1_ReLU_4_4,
-                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
-                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
-                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN]
+                           # Conv1x1_ReLU_4_4,
+                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN],
+                           # Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4]
         self.mixed_op_3 = MixedOp(32, 64, op_candidates_3)
         op_candidates_4 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
-                           Conv1x1_ReLU_4_4,
+                           # Conv1x1_ReLU_4_4,
                            Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
-                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
-                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN,
+                           # Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
                            NoConv]
         self.mixed_op_4 = MixedOp(64, 64, op_candidates_4)
 
         op_candidates_5 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
-                           Conv1x1_ReLU_4_4,
-                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
-                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
-                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN]
+                           # Conv1x1_ReLU_4_4,
+                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN],
+                           # Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4]
         self.mixed_op_5 = MixedOp(64, 128, op_candidates_5)
         op_candidates_6 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
-                           Conv1x1_ReLU_4_4,
+                           # Conv1x1_ReLU_4_4,
                            Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
-                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
-                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN,
+                           # Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
                            NoConv]
         self.mixed_op_6 = MixedOp(128, 128, op_candidates_6)
         
