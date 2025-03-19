@@ -430,6 +430,7 @@ class TinyDARTSNetwork(nn.Module):
 class VerySimpleDARTSNetwork(nn.Module):
     def __init__(self, num_classes=10, input_shape=(1, 32, 32)):
         super().__init__()
+        
         op_candidates_1 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
                            Conv1x1_ReLU_4_4,
                            Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
@@ -441,30 +442,70 @@ class VerySimpleDARTSNetwork(nn.Module):
                            Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
                            Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
                            Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN,
-                           NoConv, NoConv_ReLU, NoConv_ReLU_BN]
+                           NoConv]
         self.mixed_op_2 = MixedOp(32, 32, op_candidates_2)
-        # self.conv2 = nn.Conv2d(32, 32, kernel_size=3, padding=1, bias=True)
-        self.fc1 = nn.Linear(32 * input_shape[1]//2 * input_shape[2]//2, 128)
-        self.fc2 = nn.Linear(128, num_classes)
+        
+        op_candidates_3 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
+                           Conv1x1_ReLU_4_4,
+                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
+                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
+                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN]
+        self.mixed_op_3 = MixedOp(32, 64, op_candidates_3)
+        op_candidates_4 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
+                           Conv1x1_ReLU_4_4,
+                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
+                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
+                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN,
+                           NoConv]
+        self.mixed_op_4 = MixedOp(64, 64, op_candidates_4)
 
+        op_candidates_5 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
+                           Conv1x1_ReLU_4_4,
+                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
+                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
+                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN]
+        self.mixed_op_5 = MixedOp(64, 128, op_candidates_5)
+        op_candidates_6 = [Conv1x1, Conv1x1_ReLU, Conv1x1_ReLU_BN,
+                           Conv1x1_ReLU_4_4,
+                           Conv3x3, Conv3x3_ReLU, Conv3x3_ReLU_BN,
+                           Conv3x3_ReLU_2_2, Conv3x3_ReLU_4_4,
+                           Conv5x5, Conv5x5_ReLU, Conv5x5_ReLU_BN,
+                           NoConv]
+        self.mixed_op_6 = MixedOp(128, 128, op_candidates_6)
+        
+        self.fc1 = nn.Linear(128 * input_shape[1]//8 * input_shape[2]//8, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, num_classes)
+        
     def forward(self, x):
         x = self.mixed_op_1(x)
         x = self.mixed_op_2(x)
+        x = F.max_pool2d(x, 2)
+        x = self.mixed_op_3(x)
+        x = self.mixed_op_4(x)
+        x = F.max_pool2d(x, 2)
+        x = self.mixed_op_5(x)
+        x = self.mixed_op_6(x)
         x = F.max_pool2d(x, 2)
         x = x.view(x.size(0), -1)
         x = self.fc1(x)
         x = F.relu(x)
         x = self.fc2(x)
+        x = F.relu(x)
+        x = self.fc3(x)
         return x
 
     @property
     def getMixedOpsList(self):
         """Return a list of architecture parameters (alphas) to be optimized separately."""
-        return [self.mixed_op_1, self.mixed_op_2]  # , self.mixed_op_3.alpha]
+        return [self.mixed_op_1, self.mixed_op_2, self.mixed_op_3,
+                self.mixed_op_4, self.mixed_op_5, self.mixed_op_6]  # , self.mixed_op_3.alpha]
 
     def getLatency(self):
         """Return a list of architecture parameters (alphas) to be optimized separately."""
-        return self.mixed_op_1.getLatency() + self.mixed_op_2.getLatency()  # , self.mixed_op_3.alpha]
+        return self.mixed_op_1.getLatency() + self.mixed_op_2.getLatency() + \
+            self.mixed_op_3.getLatency() + self.mixed_op_4.getLatency() + \
+            self.mixed_op_5.getLatency() + self.mixed_op_6.getLatency()
 
 
 class SimpleCIFAR10Model(nn.Module):
