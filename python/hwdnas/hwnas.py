@@ -49,7 +49,8 @@ def main():
     # if (len(arch_params) > 0):
     #    optimizer_alpha = optim.Adam(arch_params, lr=0.001)
 
-    optimizer_all = optim.Adam(model.named_parameters(), lr=0.001)
+    all_params = model.named_parameters()
+    optimizer_all = optim.Adam(all_params, lr=0.001)
 
     criterion = nn.CrossEntropyLoss()
 
