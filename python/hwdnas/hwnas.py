@@ -9,7 +9,7 @@ import train as train
 import hardware as hardware
 
 
-def main():
+def main(iterations=50):
 
     batch_size = 32
 
@@ -17,8 +17,8 @@ def main():
     device = torch.device("cuda" if use_cuda else "cpu")
     print("using divice ", device)
 
-    dataset = load_dataset.mnist_dataset(batch_size)
-    # dataset = load_dataset.cifar10_dataset(batch_size)
+    # dataset = load_dataset.mnist_dataset(batch_size)
+    dataset = load_dataset.cifar10_dataset(batch_size)
     train_data_loader = dataset.train_loader
     test_data_loader = dataset.test_loader
 
@@ -55,7 +55,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
 
     # Run a few steps of training
-    for step in range(50):
+    for step in range(iterations):
         """
         train_loss_total, train_accuracy = train.train_weights_one_step(
                 model,
@@ -158,4 +158,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(200)
