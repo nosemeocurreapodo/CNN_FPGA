@@ -6,16 +6,16 @@ from parse_hls_xml import parse_hls_xml
 cwd = os.getcwd()+'/'
 
 data_type_dict = {"float": 0,
-                  "int": 1,
+                  "half": 1,
                   "ap_fixed<32,16>": 2,
                   "ap_fixed<16,8>": 3,
                   "ap_fixed<8,4>": 4,
                   "ap_fixed<4,2>": 5}
-data_type = data_type_dict["ap_fixed<32,16>"]
-in_channels = 128
-out_channels = 128
-height = 8
-width = 8
+data_type = data_type_dict["ap_fixed<4,2>"]
+in_channels = 3
+out_channels = 32
+height = 32
+width = 32
 padding = 1
 
 part = 'xc7z020clg400-1'

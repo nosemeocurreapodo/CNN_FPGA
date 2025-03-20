@@ -10,7 +10,7 @@
 #if DATA_TYPE == 0
 using data_type = float;
 #elif DATA_TYPE == 1
-using data_type = int;
+using data_type = half;
 #elif DATA_TYPE == 2
 using data_type = ap_fixed<32, 16>;
 #elif DATA_TYPE == 3

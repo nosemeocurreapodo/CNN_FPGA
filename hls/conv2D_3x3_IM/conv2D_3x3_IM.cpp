@@ -13,6 +13,8 @@ int TOP_NAME(hls::stream<packet_type> &input, hls::stream<packet_type> &output)
 
     //data_type weights[in_channels * out_channels * 3 * 3];
     mat3<data_type> weights[in_channels][out_channels];
+    #pragma HLS ARRAY_PARTITION variable = weights complete dim = 0
+
     conv2D_3x3_random_weights(weights);
 
     return conv2D_3x3_IM_base<data_type,

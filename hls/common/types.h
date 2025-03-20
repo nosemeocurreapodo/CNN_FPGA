@@ -644,11 +644,11 @@ struct mat3
     mat3_mul_v2_y_loop:
         for (int y = 0; y < 3; y++)
         {
-//#pragma HLS unroll
+#pragma HLS unroll
         mat3_mul_v2_x_loop:
             for (int x = 0; x < 3; x++)
             {
-//#pragma HLS unroll
+#pragma HLS unroll
                 mul[y][x] = output_type(data[y][x]) * output_type(c(y, x));
             }
         }
