@@ -5,16 +5,21 @@ from parse_hls_xml import parse_hls_xml
 
 cwd = os.getcwd()+'/'
 
-data_type_dict = {"float": 0, "int": 1, "ap_int<4,1>": 2}
-data_type = data_type_dict["float"]
-in_channels = 3
-out_channels = 1
-height = 32
-width = 32
+data_type_dict = {"float": 0,
+                  "int": 1,
+                  "ap_fixed<32,16>": 2,
+                  "ap_fixed<16,8>": 3,
+                  "ap_fixed<8,4>": 4,
+                  "ap_fixed<4,2>": 5}
+data_type = data_type_dict["ap_fixed<32,16>"]
+in_channels = 128
+out_channels = 128
+height = 8
+width = 8
 padding = 1
 
 part = 'xc7z020clg400-1'
-clock = '30'
+clock = '10'
 
 component_name = f"conv2D_3x3_IM_period_{clock}_dtype_{data_type}_shape_{in_channels}x{out_channels}x{height}x{width}_padding_{padding}"
 

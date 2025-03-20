@@ -2,7 +2,6 @@
 
 #include "hls_math.h"
 
-
 template <typename type>
 struct vec2
 {
@@ -264,7 +263,6 @@ struct vec6
     type data[6];
 };
 
-
 template <typename type>
 struct mat2
 {
@@ -282,10 +280,10 @@ struct mat2
 
     void zero()
     {
-        mat2_zero_y_loop:
+    mat2_zero_y_loop:
         for (int y = 0; y < 2; y++)
         {
-            mat2_zero_x_loop:
+        mat2_zero_x_loop:
             for (int x = 0; x < 2; x++)
             {
                 data[y][x] = 0.0;
@@ -331,14 +329,14 @@ struct mat2
         */
 
     template <typename type2>
-    mat2 operator / (type2 c)
+    mat2 operator/(type2 c)
     {
         mat2<type> result;
 
-        mat2_div_y_loop:
+    mat2_div_y_loop:
         for (int y = 0; y < 2; y++)
         {
-            mat2_div_x_loop:
+        mat2_div_x_loop:
             for (int x = 0; x < 2; x++)
             {
                 result.data[y][x] = data[y][x] / c;
@@ -353,10 +351,10 @@ struct mat2
     {
         mat2<type> result;
 
-        mat2_mult_y_loop:
+    mat2_mult_y_loop:
         for (int y = 0; y < 2; y++)
         {
-            mat2_mult_x_loop:
+        mat2_mult_x_loop:
             for (int x = 0; x < 2; x++)
             {
                 result.data[y][x] = data[y][x] * c;
@@ -370,10 +368,10 @@ struct mat2
     {
         mat2<type> result;
 
-        mat2_dot_y_loop:
+    mat2_dot_y_loop:
         for (int y = 0; y < 2; y++)
         {
-            mat2_dot_x_loop:
+        mat2_dot_x_loop:
             for (int x = 0; x < 2; x++)
             {
                 result.data[y][x] = data[y][0] * c(0, x) + data[y][1] * c(1, x);
@@ -387,7 +385,7 @@ struct mat2
     {
         vec2<type> result;
 
-        mat2_dot_loop:
+    mat2_dot_loop:
         for (int y = 0; y < 2; y++)
         {
             result(y) = data[y][0] * c(0) + data[y][1] * c(1) + data[y][2] * c(2);
@@ -398,13 +396,13 @@ struct mat2
 
     type mul_v1(mat2<type> c)
     {
-//#pragma HLS INLINE
+        // #pragma HLS INLINE
         type result = 0.0;
 
-        mat2_mul_v1_y_loop:
+    mat2_mul_v1_y_loop:
         for (int y = 0; y < 2; y++)
         {
-            mat2_mul_v1_x_loop:
+        mat2_mul_v1_x_loop:
             for (int x = 0; x < 2; x++)
             {
                 result += data[y][x] * c(y, x);
@@ -415,35 +413,35 @@ struct mat2
     }
 
     type mul_v2(mat2<type> c)
-	{
-//#pragma HLS INLINE
+    {
+        // #pragma HLS INLINE
 
         type mul[2][2];
-//#pragma HLS ARRAY_PARTITION variable = mul complete dim = 0
+        // #pragma HLS ARRAY_PARTITION variable = mul complete dim = 0
 
-        mat2_mul_v2_y_loop:
-        for(int y = 0; y < 2; y++)
+    mat2_mul_v2_y_loop:
+        for (int y = 0; y < 2; y++)
         {
 #pragma HLS unroll
-            mat2_mul_v2_x_loop:
-            for(int x =0; x < 2; x++)
+        mat2_mul_v2_x_loop:
+            for (int x = 0; x < 2; x++)
             {
 #pragma HLS unroll
-                mul[y][x] = data[y][x]*c(y, x);
+                mul[y][x] = data[y][x] * c(y, x);
             }
         }
 
-		type sum_lvl1_0  = mul[0][0] + mul[1][0];
-		type sum_lvl1_1  = mul[0][1] + mul[1][1];
+        type sum_lvl1_0 = mul[0][0] + mul[1][0];
+        type sum_lvl1_1 = mul[0][1] + mul[1][1];
 
         type res = sum_lvl1_0 + sum_lvl1_1;
 
-		return res;
-	}
+        return res;
+    }
 
     type getMax()
-	{
-//#pragma HLS INLINE
+    {
+        // #pragma HLS INLINE
         type max1 = hls::max(data[0][0], data[0][1]);
         type max2 = hls::max(data[1][0], data[1][1]);
         return hls::max(max1, max2);
@@ -480,7 +478,7 @@ struct mat3
 {
     mat3()
     {
-        //#pragma HLS ARRAY_PARTITION variable = data dim = 0 type = complete
+        // #pragma HLS ARRAY_PARTITION variable = data dim = 0 type = complete
     }
 
     mat3(type d00, type d01, type d02, type d10, type d11, type d12, type d20, type d21, type d22)
@@ -498,10 +496,10 @@ struct mat3
 
     void zero()
     {
-        mat3_zero_y_loop:
+    mat3_zero_y_loop:
         for (int y = 0; y < 3; y++)
         {
-            mat3_zero_x_loop:
+        mat3_zero_x_loop:
             for (int x = 0; x < 3; x++)
             {
                 data[y][x] = 0.0;
@@ -552,14 +550,14 @@ struct mat3
         */
 
     template <typename type2>
-    mat3 operator / (type2 c)
+    mat3 operator/(type2 c)
     {
         mat3<type> result;
 
-        mat3_div_y_loop:
+    mat3_div_y_loop:
         for (int y = 0; y < 3; y++)
         {
-            mat3_div_x_loop:
+        mat3_div_x_loop:
             for (int x = 0; x < 3; x++)
             {
                 result.data[y][x] = data[y][x] / c;
@@ -574,10 +572,10 @@ struct mat3
     {
         mat3<type> result;
 
-        mat3_mult_y_loop:
+    mat3_mult_y_loop:
         for (int y = 0; y < 3; y++)
         {
-            mat3_mult_x_loop:
+        mat3_mult_x_loop:
             for (int x = 0; x < 3; x++)
             {
                 result.data[y][x] = data[y][x] * c;
@@ -591,10 +589,10 @@ struct mat3
     {
         mat3<type> result;
 
-        mat3_dot_y_loop:
+    mat3_dot_y_loop:
         for (int y = 0; y < 3; y++)
         {
-            mat3_dot_x_loop:
+        mat3_dot_x_loop:
             for (int x = 0; x < 3; x++)
             {
                 result.data[y][x] = data[y][0] * c(0, x) + data[y][1] * c(1, x) + data[y][2] * c(2, x);
@@ -608,7 +606,7 @@ struct mat3
     {
         vec3<type> result;
 
-        mat3_dot_loop:
+    mat3_dot_loop:
         for (int y = 0; y < 3; y++)
         {
             result(y) = data[y][0] * c(0) + data[y][1] * c(1) + data[y][2] * c(2);
@@ -619,13 +617,13 @@ struct mat3
 
     type mul_v1(mat3<type> c)
     {
-//#pragma HLS INLINE
+        // #pragma HLS INLINE
         type result = 0.0;
 
-        mat3_mul_v1_y_loop:
+    mat3_mul_v1_y_loop:
         for (int y = 0; y < 3; y++)
         {
-            mat3_mul_v1_x_loop:
+        mat3_mul_v1_x_loop:
             for (int x = 0; x < 3; x++)
             {
                 result += data[y][x] * c(y, x);
@@ -637,38 +635,38 @@ struct mat3
 
     template <typename output_type, typename input_type>
     output_type mul_v2(mat3<input_type> c)
-	{
-//#pragma HLS INLINE
+    {
+        // #pragma HLS INLINE
 
         output_type mul[3][3];
-//#pragma HLS ARRAY_PARTITION variable = mul complete dim = 0
+        // #pragma HLS ARRAY_PARTITION variable = mul complete dim = 0
 
-        mat3_mul_v2_y_loop:
-        for(int y = 0; y < 3; y++)
+    mat3_mul_v2_y_loop:
+        for (int y = 0; y < 3; y++)
         {
-#pragma HLS unroll
-            mat3_mul_v2_x_loop:
-            for(int x =0; x < 3; x++)
+//#pragma HLS unroll
+        mat3_mul_v2_x_loop:
+            for (int x = 0; x < 3; x++)
             {
-#pragma HLS unroll
-                mul[y][x] = output_type(data[y][x])*output_type(c(y, x));
+//#pragma HLS unroll
+                mul[y][x] = output_type(data[y][x]) * output_type(c(y, x));
             }
         }
 
-		output_type sum_lvl1_0  = mul[0][0] + mul[1][0];
-		output_type sum_lvl1_1  = mul[0][1] + mul[1][1];
-		output_type sum_lvl1_2  = mul[0][2] + mul[1][2];
+        output_type sum_lvl1_0 = mul[0][0] + mul[1][0];
+        output_type sum_lvl1_1 = mul[0][1] + mul[1][1];
+        output_type sum_lvl1_2 = mul[0][2] + mul[1][2];
 
-		output_type sum_lvl2_0  = mul[2][0] + sum_lvl1_0;
-		output_type sum_lvl2_1  = mul[2][1] + sum_lvl1_1;
-		output_type sum_lvl2_2  = mul[2][2] + sum_lvl1_2;
+        output_type sum_lvl2_0 = mul[2][0] + sum_lvl1_0;
+        output_type sum_lvl2_1 = mul[2][1] + sum_lvl1_1;
+        output_type sum_lvl2_2 = mul[2][2] + sum_lvl1_2;
 
-		output_type sum_lvl3_0 = sum_lvl2_0  + sum_lvl2_1;
+        output_type sum_lvl3_0 = sum_lvl2_0 + sum_lvl2_1;
 
         output_type res = sum_lvl3_0 + sum_lvl2_2;
 
-		return res;
-	}
+        return res;
+    }
 
     type &operator()(int b, int c)
     {
@@ -724,10 +722,10 @@ struct mat6
     mat6 operator/(type2 c)
     {
         mat6<type> result;
-        mat6_div_y_loop:
+    mat6_div_y_loop:
         for (int y = 0; y < 6; y++)
         {
-            mat6_div_x_loop:
+        mat6_div_x_loop:
             for (int x = 0; x < 6; x++)
             {
                 result(y, x) = data[y][x] / c;
@@ -741,10 +739,10 @@ struct mat6
     {
         mat6<type> result;
 
-        mat6_mul_y_loop:
+    mat6_mul_y_loop:
         for (int y = 0; y < 6; y++)
         {
-            mat6_mul_x_loop:
+        mat6_mul_x_loop:
             for (int x = 0; x < 6; x++)
             {
                 result(y, x) = data[y][x] * c;
@@ -772,13 +770,13 @@ struct mat6
     {
         mat6<type> result;
 
-        mat6_dot_y_loop:
+    mat6_dot_y_loop:
         for (int y = 0; y < 6; y++)
         {
-            mat6_dot_x_loop:
+        mat6_dot_x_loop:
             for (int x = 0; x < 6; x++)
             {
-                mat6_dot_z_loop:
+            mat6_dot_z_loop:
                 for (int z = 0; z < 6; z++)
                     result(y, x) += data[y][z] * c(z, y);
             }
@@ -1155,14 +1153,14 @@ public:
 
     type shift_down(type val_in)
     {
-//#pragma HLS INLINE
+        // #pragma HLS INLINE
 
         type val_out = data[0];
 
     shift_down_loop:
         for (int i = 0; i < size - 1; i++)
         {
-//#pragma HLS UNROLL
+            // #pragma HLS UNROLL
 
             data[i] = data[i + 1];
         }
@@ -1192,7 +1190,7 @@ public:
         matrix(2, 2) = val;
 
         type line2_val = line2.shift_down(m20);
-        
+
         type m10 = matrix(1, 0);
         matrix(1, 0) = matrix(1, 1);
         matrix(1, 1) = matrix(1, 2);
@@ -1200,7 +1198,7 @@ public:
 
         type line1_val = line1.shift_down(m10);
 
-        //type m00 = matrix(0, 0);
+        // type m00 = matrix(0, 0);
         matrix(0, 0) = matrix(0, 1);
         matrix(0, 1) = matrix(0, 2);
         matrix(0, 2) = line1_val;
@@ -1212,8 +1210,8 @@ public:
     }
 
 private:
-    shift_register<type, size-3> line1;
-    shift_register<type, size-3> line2;
+    shift_register<type, size - 3> line1;
+    shift_register<type, size - 3> line2;
     mat3<type> matrix;
 };
 
@@ -1232,8 +1230,8 @@ public:
         matrix(1, 1) = val;
 
         type line_val = line.shift_down(m10);
-        
-        //type m10 = matrix(1, 0);
+
+        // type m10 = matrix(1, 0);
         matrix(0, 0) = matrix(0, 1);
         matrix(0, 1) = line_val;
     }
@@ -1244,7 +1242,6 @@ public:
     }
 
 private:
-    shift_register<type, size-2> line;
+    shift_register<type, size - 2> line;
     mat2<type> matrix;
 };
-
