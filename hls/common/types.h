@@ -481,17 +481,17 @@ struct mat3
         // #pragma HLS ARRAY_PARTITION variable = data dim = 0 type = complete
     }
 
-    mat3(type d00, type d01, type d02, type d10, type d11, type d12, type d20, type d21, type d22)
+    mat3(const type d[3 * 3])
     {
-        data[0][0] = d00;
-        data[0][1] = d01;
-        data[0][2] = d02;
-        data[1][0] = d10;
-        data[1][1] = d11;
-        data[1][2] = d12;
-        data[2][0] = d20;
-        data[2][1] = d21;
-        data[2][2] = d22;
+        data[0][0] = d[0];
+        data[0][1] = d[1];
+        data[0][2] = d[2];
+        data[1][0] = d[3];
+        data[1][1] = d[4];
+        data[1][2] = d[5];
+        data[2][0] = d[6];
+        data[2][1] = d[7];
+        data[2][2] = d[8];
     }
 
     void zero()

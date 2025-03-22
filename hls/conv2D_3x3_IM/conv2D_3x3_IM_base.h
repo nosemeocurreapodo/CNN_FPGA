@@ -4,19 +4,19 @@
 #include "hls_stream.h"
 #include "../common/types.h"
 
-template <typename data_type, typename packet_type, int in_channels, int out_channels, int height, int width, int padding>
+template <typename data_type, typename packet_type, bool use_relu, int in_channels, int out_channels, int in_height, int in_width, int padding>
 int conv2D_3x3_IM_base(hls::stream<packet_type> &input, hls::stream<packet_type> &output, const mat3<data_type> kernel[in_channels][out_channels])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
 #pragma HLS INTERFACE s_axilite port = return
 
-    int out_width = width - 2 + padding * 2;
-    int out_height = height - 2 + padding * 2;
+    const int out_width = in_width - 2 + padding * 2;
+    const int out_height = in_height - 2 + padding * 2;
 
     data_type out_buffer[out_channels][out_height][out_width];
 
-    shift_mat3<data_type, width + padding * 2> shift_reg;
+    shift_mat3<data_type, in_width + padding * 2> shift_reg;
     // #pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic
     //  #pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
 
@@ -24,15 +24,15 @@ in_channel_loop:
     for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
     in_y_loop:
-        for (int y = -padding; y < height + padding; y++)
+        for (int y = -padding; y < in_height + padding; y++)
         {
         in_x_loop:
-            for (int x = -padding; x < width + padding; x++)
+            for (int x = -padding; x < in_width + padding; x++)
             {
                 // #pragma HLS PIPELINE II=1
 
                 data_type in_data = data_type(0.0f);
-                if (x >= 0 && x < width && y >= 0 && y < height)
+                if (x >= 0 && x < in_width && y >= 0 && y < in_height)
                 {
                     packet_type in_packet;
                     input.read(in_packet);
@@ -65,10 +65,10 @@ in_channel_loop:
 
                     if (x >= 2 - padding && y >= 2 - padding)
                     {
-                        if (out_channel)
-                            out_buffer[out_channel][y - 2 - padding][x - 2 - padding] = conv;
+                        if (in_channel == 0)
+                            out_buffer[out_channel][y - 2 + padding][x - 2 + padding] = conv;
                         else
-                            out_buffer[out_channel][y - 2 - padding][x - 2 - padding] += conv;
+                            out_buffer[out_channel][y - 2 + padding][x - 2 + padding] += conv;
                     }
                 }
             }
@@ -85,6 +85,10 @@ out_channel_loop:
             for (int x = 0; x < out_width; x++)
             {
                 data_type out_data = out_buffer[out_channel][y][x];
+
+                if(use_relu)
+                    if (out_data < data_type(0.0f))
+                        out_data = data_type(0.0f);
 
                 packet_type out_packet;
                 out_packet.data = out_data;

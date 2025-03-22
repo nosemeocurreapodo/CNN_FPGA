@@ -27,6 +27,7 @@ using packet_type = hls::axis<data_type, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABL
 
 const int in_channels = IN_CHANNELS;
 const int out_channels = OUT_CHANNELS;
-const int height = HEIGHT;
-const int width = WIDTH;
+const int in_height = IN_HEIGHT;
+const int in_width = IN_WIDTH;
 const int padding = PADDING;
+const bool use_relu = USE_RELU;

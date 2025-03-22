@@ -816,7 +816,7 @@ class QuantWrapperFixedPoint(nn.Module):
         # self.output_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))), requires_grad=optimizeQuant)
         # self.output_scale = nn.Parameter(torch.tensor(float(0)), requires_grad=optimizeQuant)
         # self.output_zero_point = nn.Parameter(torch.tensor(float(0)), requires_grad=optimizeQuant)
-  
+
     def forward(self, x):
 
         x = FakeFixedFunction.apply(x, self.input_bits_param,
