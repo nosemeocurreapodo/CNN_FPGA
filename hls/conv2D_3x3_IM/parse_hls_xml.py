@@ -19,8 +19,8 @@ def parse_hls_xml(xml_file):
         if latency_node is not None:
             # results['Latency_best'] = latency_node.attrib.get('Best-caseLatency')
             # results['Latency_worst'] = latency_node.attrib.get('Worst-caseLatency')
-            results['Latency_best'] = latency_node.find('Best-caseLatency').text
-            results['Latency_worst'] = latency_node.find('Worst-caseLatency').text
+            # results['latency'] = latency_node.find('Best-caseLatency').text
+            results['latency'] = latency_node.find('Worst-caseLatency').text
 
     # AreaEstimates -> Resources
     area_node = root.find('AreaEstimates')
@@ -29,7 +29,7 @@ def parse_hls_xml(xml_file):
         if res_node is not None:
             # Example: <BRAM_18K>2</BRAM_18K>, <DSP48E>8</DSP48E> ...
             results['BRAM_18K'] = res_node.find('BRAM_18K').text
-            results['DSP48E'] = res_node.find('DSP').text
+            results['DSP'] = res_node.find('DSP').text
             results['FF'] = res_node.find('FF').text
             results['LUT'] = res_node.find('LUT').text
 

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+import layers as layers
 import network as network
 import load_dataset as load_dataset
 import train as train
@@ -41,7 +42,7 @@ def main(iterations=50):
 
     MixedOpLayersList = []
     for name, layer in model.named_modules():
-        if isinstance(layer, network.MixedOp):
+        if isinstance(layer, layers.MixedConv2D):
             MixedOpLayersList.append(layer)
 
     # optimizer_weights = optim.Adam(weight_params, lr=0.001)
@@ -105,7 +106,7 @@ def main(iterations=50):
                 criterion,
                 train=False
             )
-        else:    
+        else:
             train_loss_total, train_loss_cls, train_loss_latency, \
                 train_accuracy = train.train_all_one_step(
                         model,
@@ -113,7 +114,7 @@ def main(iterations=50):
                         train_data_loader,
                         optimizer_all,
                         criterion,
-                        lambda_latency=max(step*0.01, 0.1),
+                        lambda_latency=0.0,  # max(step*0.01, 0.1),
                         train=True
                     )
             test_loss_total, test_loss_cls, test_loss_latency, \
@@ -123,7 +124,7 @@ def main(iterations=50):
                         test_data_loader,
                         optimizer_all,
                         criterion,
-                        lambda_latency=max(step*0.01, 0.1),
+                        lambda_latency=0.0,  # max(step*0.01, 0.1),
                         train=False
                     )
 

@@ -30,10 +30,8 @@ conv_param_list = [{"in_channels": 1, "out_channels": 32,
 clock_list = ["10", "20", "30", "40", "50"]
 part_list = ['xc7z020clg400-1']
 
-data_type_dict = {"float": 0,
-                  "half": 1,
-                  "ap_fixed<32,16>": 2,
-                  "ap_fixed<16,8>": 3,
+data_type_dict = {"ap_fixed<1,1>": 2,
+                  "ap_fixed<2,2>": 3,
                   "ap_fixed<8,4>": 4,
                   "ap_fixed<4,2>": 5}
 
@@ -116,4 +114,12 @@ for part in part_list:
                 xml_path = component_path + component_name + \
                     "/hls/syn/report/" + component_name + "_csynth.xml"
                 data = parse_hls_xml(xml_path)
+                data["part"] = part
+                data["period"] = clock
+                data["dtype"] = data_type_name
+                data["in_channels"] = in_channels
+                data["out_channels"] = out_channels
+                data["in_height"] = in_height
+                data["in_width"] = in_width
+                data["padding"] = padding
                 print(data)

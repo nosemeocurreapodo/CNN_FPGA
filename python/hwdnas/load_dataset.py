@@ -24,18 +24,18 @@ class mnist_dataset:
 
  
 class fmnist_dataset:
-    def __init__(self, batch_size):   
+    def __init__(self, batch_size):
         transform = transforms.Compose([
             transforms.Resize((32, 32)),
             transforms.ToTensor(),
-            #transforms.Normalize((0.1307,), (0.3081,))
+            # transforms.Normalize((0.1307,), (0.3081,))
         ])
 
         train_dataset = datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
-        test_dataset  = datasets.FashionMNIST(root='./data', train=False, download=True, transform=transform)
+        test_dataset = datasets.FashionMNIST(root='./data', train=False, download=True, transform=transform)
 
         self.train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-        self.test_loader  = torch.utils.data.DataLoader(test_dataset,  batch_size=batch_size, shuffle=False)
+        self.test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
         self.classes = ('zero', 'one', 'two', 'three', 'four', 'five', 'sis', 'seven', 'eight', 'nine')
 
