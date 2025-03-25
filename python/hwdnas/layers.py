@@ -4,57 +4,69 @@ import torch.nn.functional as F
 
 import fake_quantization as fake_quantization
 
+
 # total for a pynq-z2
-# self.register_buffer('t_BRAM', torch.tensor(280))
-# self.register_buffer('t_DSP', torch.tensor(220))
-# self.register_buffer('t_FF', torch.tensor(106400))
-# self.register_buffer('t_LUT', torch.tensor(53200))
-# self.register_buffer('t_URAM', torch.tensor(0))
+def getTotalData():
+    total_dict = {"BRAM_18K": 280,
+                  "DSP": 220,
+                  "FF": 106400,
+                  "LUT": 53200,
+                  "URAM": 0}
+    total = torch.zeros([5])
+    total[0] = total_dict["BRAM_18K"]
+    total[1] = total_dict["DSP"]
+    total[2] = total_dict["FF"]
+    total[3] = total_dict["LUT"]
+    total[4] = total_dict["URAM"]
+    return total
+
+
+def isImplementable(M_data, x):
+    return torch.sum(torch.sigmoid(10.0*(M_data - x[1:])))
 
 
 def getInterpolationData():
-
     sample1_dict = {"period": 10,
-                    "bits": 8,
+                    "bits": 32,
+                    "in_channels": 32,
+                    "out_channels": 32,
+                    "in_width": 32,
+                    "in_height": 32,
+                    "kernel_size": 1,
+                    "padding": 1,
+                    "latency": 100,
+                    "BRAM_18K": 10,
+                    "DSP": 10,
+                    "FF": 10,
+                    "LUT": 10,
+                    "URAM": 0}
+    sample2_dict = {"period": 10,
+                    "bits": 32,
                     "in_channels": 32,
                     "out_channels": 32,
                     "in_width": 32,
                     "in_height": 32,
                     "kernel_size": 3,
                     "padding": 1,
-                    "latency": 8866409,
-                    "BRAM_18K": 8,
-                    "DSP": 9,
-                    "FF": 578,
-                    "LUT": 2914,
+                    "latency": 1000,
+                    "BRAM_18K": 100,
+                    "DSP": 100,
+                    "FF": 100,
+                    "LUT": 100,
                     "URAM": 0}
-    sample2_dict = {"period": 20,
+    sample3_dict = {"period": 10,
                     "bits": 32,
-                    "in_channels": 64,
-                    "out_channels": 64,
-                    "in_width": 16,
-                    "in_height": 16,
-                    "kernel_size": 3,
-                    "padding": 1,
-                    "latency": 886409,
-                    "BRAM_18K": 8,
-                    "DSP": 9,
-                    "FF": 1578,
-                    "LUT": 21914,
-                    "URAM": 0}
-    sample3_dict = {"period": 30,
-                    "bits": 4,
                     "in_channels": 128,
                     "out_channels": 128,
-                    "in_width": 8,
-                    "in_height": 8,
+                    "in_width": 32,
+                    "in_height": 32,
                     "kernel_size": 3,
                     "padding": 1,
-                    "latency": 88409,
-                    "BRAM_18K": 8,
-                    "DSP": 9,
-                    "FF": 15778,
-                    "LUT": 219614,
+                    "latency": 10000,
+                    "BRAM_18K": 1000,
+                    "DSP": 1000,
+                    "FF": 1000,
+                    "LUT": 1000,
                     "URAM": 0}
     samples = [sample1_dict, sample2_dict, sample3_dict]
 
@@ -138,7 +150,11 @@ class Conv2DHWNAS(nn.Module):
         #                         requires_grad=True)
 
     def forward(self, x):
-        # return F.relu(self.op(x))
+        x = self.op(x)
+        if self.use_relu:
+            return F.relu(x)
+        else:
+            return x
 
         x = fake_quantization.fake_fixed_truncate(x,
                                                   self.bits,
@@ -167,7 +183,7 @@ class Conv2DHWNAS(nn.Module):
                      dilation=self.op.dilation,
                      groups=self.op.groups)
 
-        if (self.use_relu):
+        if self.use_relu:
             return F.relu(x)
         else:
             return x
@@ -178,16 +194,72 @@ class Conv2DHWNAS(nn.Module):
                                           self.x)
 
 
+class Conv2D_1k_8b_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(8, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         1, 0)
+
+
+class Conv2D_1k_16b_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(16, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         1, 0)
+
+
+class Conv2D_1k_32b_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(32, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         1, 0)
+
+
+class Conv2D_3k_8b_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(8, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1)
+
+
+class Conv2D_3k_16b_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(16, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1)
+
+
+class Conv2D_3k_32b_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(32, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1)
+
+
 class MixedConv2D(nn.Module):
     """
     A single edge that mixes multiple candidate ops,
     weighted by architecture parameters alpha.
     """
-    def __init__(self, op_candidates):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height, op_candidates):
         super().__init__()
         self._ops = nn.ModuleList()
         for op in op_candidates:
-            self._ops.append(op)
+            self._ops.append(op(in_channels, out_channels,
+                                in_width, in_height))
 
         # Architecture parameters for this edge
         # We'll treat alpha as a learnable Tensor that has one entry per op.

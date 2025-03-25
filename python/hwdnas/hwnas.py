@@ -114,7 +114,7 @@ def main(iterations=50):
                         train_data_loader,
                         optimizer_all,
                         criterion,
-                        lambda_latency=0.0,  # max(step*0.01, 0.1),
+                        lambda_latency=0.000001,  # max(step*0.01, 0.1),
                         train=True
                     )
             test_loss_total, test_loss_cls, test_loss_latency, \
@@ -124,7 +124,7 @@ def main(iterations=50):
                         test_data_loader,
                         optimizer_all,
                         criterion,
-                        lambda_latency=0.0,  # max(step*0.01, 0.1),
+                        lambda_latency=0.000001,  # max(step*0.01, 0.1),
                         train=False
                     )
 

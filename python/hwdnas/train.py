@@ -117,9 +117,10 @@ def train_all_one_step(model,
 
         #  (Hardware-aware) Latency penalty
         loss_latency = model.getLatency()
+        loss_imp = model.getImplementability()
 
         # Combine them into a total loss
-        loss = loss_cls + lambda_latency * loss_latency
+        loss = loss_cls + lambda_latency * loss_latency + loss_imp
 
         if (train):
             # -- Backward pass for weights and alpha (in real DARTS, these are done on separate splits) --
