@@ -114,7 +114,8 @@ def main(iterations=50):
                         train_data_loader,
                         optimizer_all,
                         criterion,
-                        lambda_latency=0.000001,  # max(step*0.01, 0.1),
+                        lambda_latency=1e-7,  # max(step*0.01, 0.1),
+                        lambda_implementability=100.0,
                         train=True
                     )
             test_loss_total, test_loss_cls, test_loss_latency, \
@@ -124,23 +125,26 @@ def main(iterations=50):
                         test_data_loader,
                         optimizer_all,
                         criterion,
-                        lambda_latency=0.000001,  # max(step*0.01, 0.1),
+                        lambda_latency=1e-7,  # max(step*0.01, 0.1),
+                        lambda_implementability=100.0,
                         train=False
                     )
 
         if step % 1 == 0:
             print(f"Step {step:02d}")
             print(f"Train: |"
-                  f"Loss: {train_loss_total:.2f} | "
-                  f"Accuracy: {train_accuracy:.2f}")
+                  f"Loss: {train_loss_total:.4f} | "
+                  f"Accuracy: {train_accuracy:.4f}")
             print(f"Test: |"
-                  f"Loss: {test_loss_total:.2f} | "
-                  f"Accuracy: {test_accuracy:.2f}")
+                  f"Loss: {test_loss_total:.4f} | "
+                  f"Accuracy: {test_accuracy:.4f}")
             if (len(MixedOpLayersList) > 0):
-                print(f"Cls loss: {train_loss_cls:.2f} |"
-                      f"Lat loss: {train_loss_latency:.2f}")
+                print(f"Cls loss: {train_loss_cls:.4f} |"
+                      f"Lat loss: {train_loss_latency:.4f}")
                 for index, layer in enumerate(MixedOpLayersList):
                     print(f"Alpha {index}: {layer.alpha.data}")
+            print("hardware results: ", model.getHardwareResults())
+            print("isImplementable: ", model.getImplementability())
 
     if (len(MixedOpLayersList) > 0):
         for index, layer in enumerate(MixedOpLayersList):

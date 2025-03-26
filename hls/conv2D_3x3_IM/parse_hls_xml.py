@@ -20,7 +20,10 @@ def parse_hls_xml(xml_file):
             # results['Latency_best'] = latency_node.attrib.get('Best-caseLatency')
             # results['Latency_worst'] = latency_node.attrib.get('Worst-caseLatency')
             # results['latency'] = latency_node.find('Best-caseLatency').text
-            results['latency'] = latency_node.find('Worst-caseLatency').text
+            results['latency'] = int(latency_node.find('Worst-caseLatency').text)
+        latency_node = perf_node.find('SummaryOfTimingAnalysis')
+        if latency_node is not None:
+            results['clock'] = float(latency_node.find('EstimatedClockPeriod').text)
 
     # AreaEstimates -> Resources
     area_node = root.find('AreaEstimates')
@@ -28,9 +31,9 @@ def parse_hls_xml(xml_file):
         res_node = area_node.find('Resources')
         if res_node is not None:
             # Example: <BRAM_18K>2</BRAM_18K>, <DSP48E>8</DSP48E> ...
-            results['BRAM_18K'] = res_node.find('BRAM_18K').text
-            results['DSP'] = res_node.find('DSP').text
-            results['FF'] = res_node.find('FF').text
-            results['LUT'] = res_node.find('LUT').text
+            results['BRAM_18K'] = int(res_node.find('BRAM_18K').text)
+            results['DSP'] = int(res_node.find('DSP').text)
+            results['FF'] = int(res_node.find('FF').text)
+            results['LUT'] = int(res_node.find('LUT').text)
 
     return results

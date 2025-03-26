@@ -5,76 +5,31 @@ import torch.nn.functional as F
 import fake_quantization as fake_quantization
 
 
-# total for a pynq-z2
-def getTotalData():
-    total_dict = {"BRAM_18K": 280,
-                  "DSP": 220,
-                  "FF": 106400,
-                  "LUT": 53200,
-                  "URAM": 0}
-    total = torch.zeros([5])
-    total[0] = total_dict["BRAM_18K"]
-    total[1] = total_dict["DSP"]
-    total[2] = total_dict["FF"]
-    total[3] = total_dict["LUT"]
-    total[4] = total_dict["URAM"]
-    return total
-
-
-def isImplementable(M_data, x):
-    return torch.sum(torch.sigmoid(10.0*(M_data - x[1:])))
-
-
 def getInterpolationData():
-    sample1_dict = {"period": 10,
-                    "bits": 32,
-                    "in_channels": 32,
-                    "out_channels": 32,
-                    "in_width": 32,
-                    "in_height": 32,
-                    "kernel_size": 1,
-                    "padding": 1,
-                    "latency": 100,
-                    "BRAM_18K": 10,
-                    "DSP": 10,
-                    "FF": 10,
-                    "LUT": 10,
-                    "URAM": 0}
-    sample2_dict = {"period": 10,
-                    "bits": 32,
-                    "in_channels": 32,
-                    "out_channels": 32,
-                    "in_width": 32,
-                    "in_height": 32,
-                    "kernel_size": 3,
-                    "padding": 1,
-                    "latency": 1000,
-                    "BRAM_18K": 100,
-                    "DSP": 100,
-                    "FF": 100,
-                    "LUT": 100,
-                    "URAM": 0}
-    sample3_dict = {"period": 10,
-                    "bits": 32,
-                    "in_channels": 128,
-                    "out_channels": 128,
-                    "in_width": 32,
-                    "in_height": 32,
-                    "kernel_size": 3,
-                    "padding": 1,
-                    "latency": 10000,
-                    "BRAM_18K": 1000,
-                    "DSP": 1000,
-                    "FF": 1000,
-                    "LUT": 1000,
-                    "URAM": 0}
-    samples = [sample1_dict, sample2_dict, sample3_dict]
+    samples = [{'latency': 33939, 'clock': 7.492, 'BRAM_18K': 32, 'DSP': 0, 'FF': 578, 'LUT': 2419, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+               {'latency': 679959, 'clock': 7.004, 'BRAM_18K': 2, 'DSP': 0, 'FF': 2004, 'LUT': 5335, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+               {'latency': 867209, 'clock': 7.194, 'BRAM_18K': 1, 'DSP': 0, 'FF': 503, 'LUT': 8000, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+               {'latency': 33939, 'clock': 6.912, 'BRAM_18K': 32, 'DSP': 0, 'FF': 567, 'LUT': 2599, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+               {'latency': 679983, 'clock': 7.28, 'BRAM_18K': 4, 'DSP': 0, 'FF': 2379, 'LUT': 7451, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+               {'latency': 873609, 'clock': 7.211, 'BRAM_18K': 2, 'DSP': 0, 'FF': 660, 'LUT': 17253, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+               {'latency': 33939, 'clock': 7.234, 'BRAM_18K': 32, 'DSP': 0, 'FF': 683, 'LUT': 2632, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+               {'latency': 679976, 'clock': 6.968, 'BRAM_18K': 8, 'DSP': 0, 'FF': 3496, 'LUT': 10380, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+               {'latency': 886409, 'clock': 7.194, 'BRAM_18K': 4, 'DSP': 0, 'FF': 1042, 'LUT': 22141, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+               {'latency': 33935, 'clock': 10.746, 'BRAM_18K': 32, 'DSP': 0, 'FF': 342, 'LUT': 2355, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+               {'latency': 679956, 'clock': 12.789, 'BRAM_18K': 2, 'DSP': 0, 'FF': 1953, 'LUT': 5280, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+               {'latency': 854407, 'clock': 14.435, 'BRAM_18K': 1, 'DSP': 0, 'FF': 387, 'LUT': 7991, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+               {'latency': 33935, 'clock': 13.482, 'BRAM_18K': 32, 'DSP': 0, 'FF': 360, 'LUT': 2526, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+               {'latency': 679981, 'clock': 13.404, 'BRAM_18K': 4, 'DSP': 0, 'FF': 2264, 'LUT': 7405, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+               {'latency': 860807, 'clock': 13.03, 'BRAM_18K': 2, 'DSP': 0, 'FF': 487, 'LUT': 17244, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+               {'latency': 33935, 'clock': 14.157, 'BRAM_18K': 32, 'DSP': 0, 'FF': 396, 'LUT': 2559, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+               {'latency': 679982, 'clock': 14.256, 'BRAM_18K': 8, 'DSP': 0, 'FF': 2863, 'LUT': 10343, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+               {'latency': 860807, 'clock': 13.452, 'BRAM_18K': 4, 'DSP': 0, 'FF': 627, 'LUT': 22100, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1}]
 
     torch_X_samples = torch.zeros([len(samples), 8])
     torch_Y_samples = torch.zeros([len(samples), 6])
 
     for i, sample in enumerate(samples):
-        torch_X_samples[i, 0] = sample["period"]
+        torch_X_samples[i, 0] = sample["clock"]
         torch_X_samples[i, 1] = sample["bits"]
         torch_X_samples[i, 2] = sample["in_channels"]
         torch_X_samples[i, 3] = sample["out_channels"]
@@ -88,7 +43,7 @@ def getInterpolationData():
         torch_Y_samples[i, 2] = sample["DSP"]
         torch_Y_samples[i, 3] = sample["FF"]
         torch_Y_samples[i, 4] = sample["LUT"]
-        torch_Y_samples[i, 5] = sample["URAM"]
+        torch_Y_samples[i, 5] = 0  # sample["URAM"]
 
     return torch_Y_samples, torch_X_samples
 
@@ -121,11 +76,14 @@ class Conv2DHWNAS(nn.Module):
                  in_channels, out_channels,
                  in_width, in_height,
                  kernel_size,
-                 padding):
+                 padding,
+                 bias=True):
         super().__init__()
-        self.op = nn.Conv2d(in_channels, out_channels,
-                            kernel_size=kernel_size,
-                            padding=padding)
+        self.op = fake_quantization.QuantWrapperFixedPoint2(
+                            nn.Conv2d(in_channels, out_channels,
+                                      kernel_size=kernel_size,
+                                      padding=padding,
+                                      bias=bias), bits, False)
         self.bits = bits
         self.use_relu = use_relu
         Y_data, X_data = getInterpolationData()
@@ -156,42 +114,11 @@ class Conv2DHWNAS(nn.Module):
         else:
             return x
 
-        x = fake_quantization.fake_fixed_truncate(x,
-                                                  self.bits,
-                                                  0,
-                                                  0)
-
-        if hasattr(self.op, 'weight') and self.op.weight is not None:
-            w = fake_quantization.fake_fixed_truncate(self.op.weight,
-                                                      self.bits,
-                                                      0,
-                                                      0)
-        else:
-            w = None
-
-        if hasattr(self.op, 'bias') and self.op.bias is not None:
-            b = fake_quantization.fake_fixed_truncate(self.op.bias,
-                                                      self.bits,
-                                                      0,
-                                                      0)
-        else:
-            b = None
-
-        x = F.conv2d(x, w, b,
-                     stride=self.op.stride,
-                     padding=self.op.padding,
-                     dilation=self.op.dilation,
-                     groups=self.op.groups)
-
-        if self.use_relu:
-            return F.relu(x)
-        else:
-            return x
-
     def estimate_params(self):
-        return conv2D_3x3_estimate_params(self.Y_data,
-                                          self.X_data,
-                                          self.x)
+        est_params = conv2D_3x3_estimate_params(self.Y_data,
+                                                self.X_data,
+                                                self.x)
+        return est_params
 
 
 class Conv2D_1k_8b_HWNAS(Conv2DHWNAS):
@@ -200,7 +127,7 @@ class Conv2D_1k_8b_HWNAS(Conv2DHWNAS):
         super().__init__(8, True,
                          in_channels, out_channels,
                          in_width, in_height,
-                         1, 0)
+                         1, 0, False)
 
 
 class Conv2D_1k_16b_HWNAS(Conv2DHWNAS):
@@ -209,7 +136,7 @@ class Conv2D_1k_16b_HWNAS(Conv2DHWNAS):
         super().__init__(16, True,
                          in_channels, out_channels,
                          in_width, in_height,
-                         1, 0)
+                         1, 0, False)
 
 
 class Conv2D_1k_32b_HWNAS(Conv2DHWNAS):
@@ -218,7 +145,25 @@ class Conv2D_1k_32b_HWNAS(Conv2DHWNAS):
         super().__init__(32, True,
                          in_channels, out_channels,
                          in_width, in_height,
-                         1, 0)
+                         1, 0, False)
+
+
+class Conv2D_3k_2b_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(2, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1, False)
+
+
+class Conv2D_3k_4b_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(4, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1, False)
 
 
 class Conv2D_3k_8b_HWNAS(Conv2DHWNAS):
@@ -227,7 +172,7 @@ class Conv2D_3k_8b_HWNAS(Conv2DHWNAS):
         super().__init__(8, True,
                          in_channels, out_channels,
                          in_width, in_height,
-                         3, 1)
+                         3, 1, False)
 
 
 class Conv2D_3k_16b_HWNAS(Conv2DHWNAS):
@@ -236,7 +181,7 @@ class Conv2D_3k_16b_HWNAS(Conv2DHWNAS):
         super().__init__(16, True,
                          in_channels, out_channels,
                          in_width, in_height,
-                         3, 1)
+                         3, 1, False)
 
 
 class Conv2D_3k_32b_HWNAS(Conv2DHWNAS):
@@ -245,7 +190,7 @@ class Conv2D_3k_32b_HWNAS(Conv2DHWNAS):
         super().__init__(32, True,
                          in_channels, out_channels,
                          in_width, in_height,
-                         3, 1)
+                         3, 1, False)
 
 
 class MixedConv2D(nn.Module):

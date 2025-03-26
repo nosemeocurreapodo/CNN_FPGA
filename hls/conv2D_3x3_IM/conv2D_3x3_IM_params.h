@@ -7,18 +7,18 @@
 #include "ap_float.h"
 #include "../common/floatX.h"
 
-#if DATA_TYPE == 0
-using data_type = float;
-#elif DATA_TYPE == 1
-using data_type = half;
+#if DATA_TYPE == 1
+using data_type = ap_fixed<1, 1>;
 #elif DATA_TYPE == 2
-using data_type = ap_fixed<32, 16>;
-#elif DATA_TYPE == 3
-using data_type = ap_fixed<16, 8>;
+using data_type = ap_fixed<2, 1>;
 #elif DATA_TYPE == 4
-using data_type = ap_fixed<8, 4>;
-#elif DATA_TYPE == 5
 using data_type = ap_fixed<4, 2>;
+#elif DATA_TYPE == 8
+using data_type = ap_fixed<8, 4>;
+#elif DATA_TYPE == 16
+using data_type = ap_fixed<16, 8>;
+#elif DATA_TYPE == 32
+using data_type = ap_fixed<32, 16>;
 #else
 #error "Unsupported DATA_TYPE"
 #endif

@@ -5,42 +5,68 @@ import torch.nn.functional as F
 import layers
 
 
+# total for a pynq-z2
+def getTotalData():
+    total_dict = {"BRAM_18K": 280,
+                  "DSP": 220,
+                  "FF": 106400,
+                  "LUT": 53200,
+                  "URAM": 0}
+    total = torch.zeros([5])
+    total[0] = total_dict["BRAM_18K"]
+    total[1] = total_dict["DSP"]
+    total[2] = total_dict["FF"]
+    total[3] = total_dict["LUT"]
+    total[4] = total_dict["URAM"]
+    return total
+
+
+def isImplementable(M_data, x):
+    return torch.sum(torch.sigmoid(10.0*(M_data[:-1] - x[1:-1])/M_data[:-1]))
+
+
 class VerySimpleDARTSNetwork(nn.Module):
     def __init__(self, num_classes=10, input_shape=(1, 32, 32)):
         super().__init__()
 
-        op_candidates_1 = [layers.Conv2D_1k_32b_HWNAS,
-                           layers.Conv2D_3k_32b_HWNAS]
+        op_candidates_1 = [layers.Conv2D_3k_2b_HWNAS,
+                           layers.Conv2D_3k_4b_HWNAS,
+                           layers.Conv2D_3k_8b_HWNAS]
         self.mixed_op_1 = layers.MixedConv2D(input_shape[0], 32,
                                              input_shape[1], input_shape[2],
                                              op_candidates_1)
 
-        op_candidates_2 = [layers.Conv2D_1k_32b_HWNAS,
-                           layers.Conv2D_3k_32b_HWNAS]
+        op_candidates_2 = [layers.Conv2D_3k_2b_HWNAS,
+                           layers.Conv2D_3k_4b_HWNAS,
+                           layers.Conv2D_3k_8b_HWNAS]
         self.mixed_op_2 = layers.MixedConv2D(32, 32,
                                              input_shape[1], input_shape[2],
                                              op_candidates_2)
 
-        op_candidates_3 = [layers.Conv2D_1k_32b_HWNAS,
-                           layers.Conv2D_3k_32b_HWNAS]
+        op_candidates_3 = [layers.Conv2D_3k_2b_HWNAS,
+                           layers.Conv2D_3k_4b_HWNAS,
+                           layers.Conv2D_3k_8b_HWNAS]
         self.mixed_op_3 = layers.MixedConv2D(32, 64,
                                              input_shape[1]/2, input_shape[2]/2,
                                              op_candidates_3)
 
-        op_candidates_4 = [layers.Conv2D_1k_32b_HWNAS,
-                           layers.Conv2D_3k_32b_HWNAS]
+        op_candidates_4 = [layers.Conv2D_3k_2b_HWNAS,
+                           layers.Conv2D_3k_4b_HWNAS,
+                           layers.Conv2D_3k_8b_HWNAS]
         self.mixed_op_4 = layers.MixedConv2D(64, 64,
                                              input_shape[1]/2, input_shape[2]/2,
                                              op_candidates_4)
 
-        op_candidates_5 = [layers.Conv2D_1k_32b_HWNAS,
-                           layers.Conv2D_3k_32b_HWNAS]
+        op_candidates_5 = [layers.Conv2D_3k_2b_HWNAS,
+                           layers.Conv2D_3k_4b_HWNAS,
+                           layers.Conv2D_3k_8b_HWNAS]
         self.mixed_op_5 = layers.MixedConv2D(64, 128,
                                              input_shape[1]/4, input_shape[2]/4,
                                              op_candidates_5)
 
-        op_candidates_6 = [layers.Conv2D_1k_32b_HWNAS,
-                           layers.Conv2D_3k_32b_HWNAS]
+        op_candidates_6 = [layers.Conv2D_3k_2b_HWNAS,
+                           layers.Conv2D_3k_4b_HWNAS,
+                           layers.Conv2D_3k_8b_HWNAS]
         self.mixed_op_6 = layers.MixedConv2D(128, 128,
                                              input_shape[1]/4, input_shape[2]/4,
                                              op_candidates_6)
@@ -49,7 +75,7 @@ class VerySimpleDARTSNetwork(nn.Module):
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, num_classes)
 
-        max_hardware = layers.getTotalData()
+        max_hardware = getTotalData()
         self.register_buffer('max_hardware', max_hardware)
 
         # self.period = nn.Parameter(torch.tensor(10.0), requires_grad=True)
@@ -78,23 +104,23 @@ class VerySimpleDARTSNetwork(nn.Module):
         return [self.mixed_op_1, self.mixed_op_2, self.mixed_op_3,
                 self.mixed_op_4, self.mixed_op_5, self.mixed_op_6]  # , self.mixed_op_3.alpha]
 
-    def getLatency(self):
-        """Return a list of architecture parameters (alphas) to be optimized separately."""
-        return self.mixed_op_1.estimate_params()[0] + \
-            self.mixed_op_2.estimate_params()[0] + \
-            self.mixed_op_3.estimate_params()[0] + \
-            self.mixed_op_4.estimate_params()[0] + \
-            self.mixed_op_5.estimate_params()[0] + \
-            self.mixed_op_6.estimate_params()[0]
-
-    def getImplementability(self):
+    def getHardwareResults(self):
         used_hardware = self.mixed_op_1.estimate_params() + \
                         self.mixed_op_2.estimate_params() + \
                         self.mixed_op_3.estimate_params() + \
                         self.mixed_op_4.estimate_params() + \
                         self.mixed_op_5.estimate_params() + \
                         self.mixed_op_6.estimate_params()
-        return layers.isImplementable(self.max_hardware, used_hardware)
+        return used_hardware
+
+    def getLatency(self):
+        """Return a list of architecture parameters (alphas) to be optimized separately."""
+        return self.getHardwareResults()[0]
+
+    def getImplementability(self):
+        used_hardware = self.getHardwareResults()
+        implementability = isImplementable(self.max_hardware, used_hardware)
+        return implementability
 
 
 class SimpleCIFAR10Model(nn.Module):

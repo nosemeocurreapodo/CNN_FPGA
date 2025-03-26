@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 def param_to_bit(x: torch.Tensor) -> torch.Tensor:
@@ -233,19 +234,19 @@ def test_fake_float_truncate():
 
 def fake_fixed_truncate2(x: torch.Tensor,
                          bits_int: int,
-                         scale_int: int,
-                         zero_point_int: int) -> torch.Tensor:
+                         min: float,
+                         max: float) -> torch.Tensor:
 
     qmin = 0
     qmax = 2**bits_int - 1
 
+    scaled = (qmax - qmin) * (x - min) / (max - min) + qmin
+
     # from float to fixed point, and quantize accordingly
-    q_x = torch.clamp(torch.round(x * 2**(scale_int + bits_int//2) +
-                      2**(bits_int-1) + zero_point_int), qmin, qmax)
+    q_x = torch.clamp(torch.round(scaled), qmin, qmax)
 
     # from quantized fixed point to float
-    fq_x = (q_x - 2**(bits_int-1) - zero_point_int) / \
-        2**(scale_int + bits_int//2)
+    fq_x = (q_x - qmin) * (max - min) / (qmax - qmin) + min
 
     return fq_x
 
@@ -415,13 +416,102 @@ class FakeFixedFunction(torch.autograd.Function):
         return grad_x, grad_bits, grad_scale_bits, grad_zero_point_bits
 
 
+class FakeFixedFunction2(torch.autograd.Function):
+    """
+    Custom autograd for 'fake-float' exponent+mantissa truncation.
+    """
+    @staticmethod
+    def forward(ctx, x, bits_param, min, max):
+
+        # save for backward
+        ctx.save_for_backward(x, bits_param, min, max)
+
+        # Round e_bits, m_bits to nearest integer for the forward pass
+        bits_int = int(torch.round(param_to_bit(bits_param)).item())
+        out = fake_fixed_truncate2(x, bits_int, min, max)
+
+        # print("input")
+        # print(x)
+        # print("output")
+        # print(out)
+
+        return out
+
+    @staticmethod
+    def backward(ctx, grad_outputs):
+        x, bits_param, min, max = ctx.saved_tensors
+
+        bits = param_to_bit(bits_param)
+
+        bits_int = int(torch.round(bits).item())
+
+        # print("shape x: ", x.shape)
+        # print("shape grad_output: ", grad_output.shape)
+
+        # 1) Gradient wrt x: straight-through
+        grad_x = grad_outputs
+
+        # 1) Gradient wrt x: approximate with central difference
+        """
+        grad_x = None
+        if True:
+            delta = 0.01            
+
+            f_plus2  = fake_float_truncate(x + 2.0*delta, e_bits_int, m_bits_int, s_int)
+            f_plus   = fake_float_truncate(x + 1.0*delta, e_bits_int, m_bits_int, s_int)
+            f_minus  = fake_float_truncate(x - 1.0*delta, e_bits_int, m_bits_int, s_int)
+            f_minus2 = fake_float_truncate(x - 2.0*delta, e_bits_int, m_bits_int, s_int)
+
+            der = (-f_plus2 + 8*f_plus - 8*f_minus + f_minus2) / (12.0 * delta)
+            grad_x = grad_output * der
+        """
+
+        # 2) Gradient wrt bits: approximate with central difference
+        grad_bits = None
+        if bits_param.requires_grad:
+            if (bits_int < 2):
+                f_plus = fake_fixed_truncate2(x,
+                                              bits_int + 1,
+                                              min,
+                                              max)
+                f_minus = fake_fixed_truncate2(x,
+                                               bits_int,
+                                               min,
+                                               max)
+                der = (f_plus - f_minus)
+            else:
+                f_plus2 = fake_fixed_truncate2(x,
+                                               bits_int + 2,
+                                               min,
+                                               max)
+                f_plus = fake_fixed_truncate2(x,
+                                              bits_int + 1,
+                                              min,
+                                              max)
+                f_minus = fake_fixed_truncate2(x,
+                                               bits_int - 1,
+                                               min,
+                                               max)
+                f_minus2 = fake_fixed_truncate2(x,
+                                                bits_int - 2,
+                                                min,
+                                                max)
+
+                der = (-f_plus2 + 8*f_plus - 8*f_minus + f_minus2) / 12.0
+
+            grad_bits = grad_outputs * der * bits
+
+        return grad_x, grad_bits, None, None
+
+
 def test_fake_fixed_truncate():
     for i in range(100):
-        bits = int(torch.round(torch.rand(1)*32).item())
-        scale = int(torch.round((torch.rand(1) - 0.5)*5.0).item())
-        zero_point = int(torch.round((torch.rand(1) - 0.5)*0.0).item())
-        in_test = (torch.rand(1)-0.5)*100.0
-        out_test = fake_fixed_truncate(in_test, bits, scale, zero_point)
+        bits = 2  #int(torch.round(torch.rand(1)*32).item())
+        scale = 0  #int(torch.round((torch.rand(1) - 0.5)*5.0).item())
+        zero_point = 0  # int(torch.round((torch.rand(1) - 0.5)*0.0).item())
+        in_test = (torch.rand(1)-0.5)*10.0
+        # out_test = fake_fixed_truncate(in_test, bits, scale, zero_point)
+        out_test = fake_fixed_truncate2(in_test, bits, -5.0, 5.0)
         print("bits ", bits, " scale ", scale, " zero_point ", zero_point)
         print("in: ", in_test, " out ", out_test)
 
@@ -550,8 +640,10 @@ class MinMaxObserver(nn.Module):
 
     def forward(self, x):
         # Update running min/max
-        self.min_val = torch.min(self.min_val, x.detach().min())
-        self.max_val = torch.max(self.max_val, x.detach().max())
+        # self.min_val = torch.min(self.min_val, x.detach().min())
+        # self.max_val = torch.max(self.max_val, x.detach().max())
+        self.min_val = x.detach().min()
+        self.max_val = x.detach().max()
         return x  # Just pass through
 
 
@@ -820,18 +912,95 @@ class QuantWrapperFixedPoint(nn.Module):
     def forward(self, x):
 
         x = FakeFixedFunction.apply(x, self.input_bits_param,
-                                    self.input_scale, self.input_zero_point)
+                                     self.input_scale, self.input_zero_point)
 
         if hasattr(self.module, 'weight') and self.module.weight != None:
             w = FakeFixedFunction.apply(self.module.weight,
-                                        self.weight_bits_param,
-                                        self.weight_scale,
-                                        self.weight_zero_point)
+                                         self.weight_bits_param,
+                                         self.weight_scale,
+                                         self.weight_zero_point)
         else:
             w = None
 
         if hasattr(self.module, 'bias') and self.module.bias != None:
             b = FakeFixedFunction.apply(self.module.bias, self.bias_bits_param, self.bias_scale, self.bias_zero_point)
+        else:
+            b = None
+
+        if isinstance(self.module, nn.Conv2d):
+            out = F.conv2d(x, w, b, stride=self.module.stride,
+                           padding=self.module.padding,
+                           dilation=self.module.dilation,
+                           groups=self.module.groups)
+        elif isinstance(self.module, nn.Linear):
+            out = F.linear(x, w, b)
+        # else:
+        #    out = self.module(x)
+
+        # out = FakeFixedFunction.apply(out, self.output_bits_param, self.output_scale, self.output_zero_point)    
+
+        return out
+
+    def getBits(self):
+        return [param_to_bit(self.input_bits_param),
+                param_to_bit(self.weight_bits_param)]
+        # return [param_to_bit(self.weight_bits_param), param_to_bit(self.bias_bits_param), param_to_bit(self.output_bits_param)]
+        # return [param_to_bit(self.weight_bits_param), param_to_bit(self.output_bits_param)]
+
+    def printQuantParams(self):
+        print("input quant params: ")
+        print("bits: ", param_to_bit(self.input_bits_param).detach().item(), " scale ", self.input_scale.detach().item(), " zero point ", self.input_zero_point.detach().item())
+        print("weight quant params: ")
+        print("bits: ", param_to_bit(self.weight_bits_param).detach().item(), " scale ", self.weight_scale.detach().item(), " zero point ", self.weight_zero_point.detach().item())
+        print("bias quant params: ")
+        print("bits: ", param_to_bit(self.bias_bits_param).detach().item(), " scale ", self.bias_scale.detach().item(), " zero point ", self.bias_zero_point.detach().item())
+        # print("output quant params: ")
+        # print("bits: ", param_to_bit(self.output_bits_param).detach().item(), " scale ", self.output_scale.detach().item(), " zero point ", self.output_zero_point.detach().item())
+
+
+class QuantWrapperFixedPoint2(nn.Module):
+    def __init__(self, module, bits=32, optimizeQuant=False):
+        super().__init__()
+        self.module = module
+
+        self.input_observer = MinMaxObserver()
+        self.weight_observer = MinMaxObserver()
+        self.bias_observer = MinMaxObserver()
+
+        self.input_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))),
+                                             requires_grad=optimizeQuant)
+        self.weight_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))),
+                                              requires_grad=optimizeQuant)
+        self.bias_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))),
+                                            requires_grad=False)
+
+        # self.output_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))), requires_grad=optimizeQuant)
+        # self.output_scale = nn.Parameter(torch.tensor(float(0)), requires_grad=optimizeQuant)
+        # self.output_zero_point = nn.Parameter(torch.tensor(float(0)), requires_grad=optimizeQuant)
+
+    def forward(self, x):
+
+        x = self.input_observer(x)
+        x = FakeFixedFunction2.apply(x,
+                                     self.input_bits_param,
+                                     self.input_observer.min_val,
+                                     self.input_observer.max_val)
+
+        if hasattr(self.module, 'weight') and self.module.weight != None:
+            w = self.weight_observer(self.module.weight)
+            w = FakeFixedFunction2.apply(w,
+                                         self.weight_bits_param,
+                                         self.weight_observer.min_val,
+                                         self.weight_observer.max_val)
+        else:
+            w = None
+
+        if hasattr(self.module, 'bias') and self.module.bias != None:
+            b = self.bias_observer(self.module.bias)
+            b = FakeFixedFunction2.apply(b,
+                                         self.bias_bits_param,
+                                         self.bias_observer.min_val,
+                                         self.bias_observer.max_val)
         else:
             b = None
 
