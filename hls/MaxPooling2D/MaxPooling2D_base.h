@@ -2,11 +2,7 @@
 
 #include "ap_axi_sdata.h"
 #include "hls_stream.h"
-// #include "ap_int.h"
-#include "ap_fixed.h"
-#include "ap_float.h"
-#include "floatX.h"
-#include "types.h"
+#include "../common/types.h"
 
 template <typename input_data_type, typename input_packet_type, typename output_data_type, typename output_packet_type, int in_channels, int in_height, int in_width>
 int MaxPooling2_base(hls::stream<input_packet_type> &input, hls::stream<output_packet_type> &output)
