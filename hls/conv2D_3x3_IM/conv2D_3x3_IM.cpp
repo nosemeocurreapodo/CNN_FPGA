@@ -20,6 +20,7 @@ int TOP_NAME(hls::stream<packet_type> &input, hls::stream<packet_type> &output)
     return conv2D_3x3_IM_base<data_type,
                               packet_type,
                               use_relu,
+                              batch_size,
                               in_channels,
                               out_channels,
                               in_height,

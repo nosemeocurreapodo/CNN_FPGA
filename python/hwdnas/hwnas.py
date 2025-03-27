@@ -115,7 +115,7 @@ def main(iterations=50):
                         optimizer_all,
                         criterion,
                         lambda_latency=1e-7,  # max(step*0.01, 0.1),
-                        lambda_implementability=100.0,
+                        lambda_implementability=1.0,
                         train=True
                     )
             test_loss_total, test_loss_cls, test_loss_latency, \
@@ -126,7 +126,7 @@ def main(iterations=50):
                         optimizer_all,
                         criterion,
                         lambda_latency=1e-7,  # max(step*0.01, 0.1),
-                        lambda_implementability=100.0,
+                        lambda_implementability=1.0,
                         train=False
                     )
 

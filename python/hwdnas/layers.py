@@ -6,27 +6,29 @@ import fake_quantization as fake_quantization
 
 
 def getInterpolationData():
-    samples = [{'latency': 33939, 'clock': 7.492, 'BRAM_18K': 32, 'DSP': 0, 'FF': 578, 'LUT': 2419, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-               {'latency': 679959, 'clock': 7.004, 'BRAM_18K': 2, 'DSP': 0, 'FF': 2004, 'LUT': 5335, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-               {'latency': 867209, 'clock': 7.194, 'BRAM_18K': 1, 'DSP': 0, 'FF': 503, 'LUT': 8000, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-               {'latency': 33939, 'clock': 6.912, 'BRAM_18K': 32, 'DSP': 0, 'FF': 567, 'LUT': 2599, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-               {'latency': 679983, 'clock': 7.28, 'BRAM_18K': 4, 'DSP': 0, 'FF': 2379, 'LUT': 7451, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-               {'latency': 873609, 'clock': 7.211, 'BRAM_18K': 2, 'DSP': 0, 'FF': 660, 'LUT': 17253, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-               {'latency': 33939, 'clock': 7.234, 'BRAM_18K': 32, 'DSP': 0, 'FF': 683, 'LUT': 2632, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-               {'latency': 679976, 'clock': 6.968, 'BRAM_18K': 8, 'DSP': 0, 'FF': 3496, 'LUT': 10380, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-               {'latency': 886409, 'clock': 7.194, 'BRAM_18K': 4, 'DSP': 0, 'FF': 1042, 'LUT': 22141, 'part': 'xc7z020clg400-1', 'period': '10', 'bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-               {'latency': 33935, 'clock': 10.746, 'BRAM_18K': 32, 'DSP': 0, 'FF': 342, 'LUT': 2355, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-               {'latency': 679956, 'clock': 12.789, 'BRAM_18K': 2, 'DSP': 0, 'FF': 1953, 'LUT': 5280, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-               {'latency': 854407, 'clock': 14.435, 'BRAM_18K': 1, 'DSP': 0, 'FF': 387, 'LUT': 7991, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-               {'latency': 33935, 'clock': 13.482, 'BRAM_18K': 32, 'DSP': 0, 'FF': 360, 'LUT': 2526, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-               {'latency': 679981, 'clock': 13.404, 'BRAM_18K': 4, 'DSP': 0, 'FF': 2264, 'LUT': 7405, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-               {'latency': 860807, 'clock': 13.03, 'BRAM_18K': 2, 'DSP': 0, 'FF': 487, 'LUT': 17244, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-               {'latency': 33935, 'clock': 14.157, 'BRAM_18K': 32, 'DSP': 0, 'FF': 396, 'LUT': 2559, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-               {'latency': 679982, 'clock': 14.256, 'BRAM_18K': 8, 'DSP': 0, 'FF': 2863, 'LUT': 10343, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-               {'latency': 860807, 'clock': 13.452, 'BRAM_18K': 4, 'DSP': 0, 'FF': 627, 'LUT': 22100, 'part': 'xc7z020clg400-1', 'period': '20', 'bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1}]
+    samples = [
+                {'clock': 5.884, 'BRAM': 3, 'DSP': 0, 'FF': 247, 'LUT': 267, 'SLICE': 104, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 8.087, 'BRAM': 2, 'DSP': 0, 'FF': 1304, 'LUT': 1509, 'SLICE': 544, 'CLB': 0, 'URAM': 0, 'latency': 679959, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.766, 'BRAM': 1, 'DSP': 0, 'FF': 311, 'LUT': 254, 'SLICE': 106, 'CLB': 0, 'URAM': 0, 'latency': 867209, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 6.157, 'BRAM': 6, 'DSP': 0, 'FF': 302, 'LUT': 353, 'SLICE': 118, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 9.051, 'BRAM': 4, 'DSP': 0, 'FF': 1639, 'LUT': 1922, 'SLICE': 668, 'CLB': 0, 'URAM': 0, 'latency': 679983, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.726, 'BRAM': 2, 'DSP': 0, 'FF': 423, 'LUT': 330, 'SLICE': 137, 'CLB': 0, 'URAM': 0, 'latency': 873609, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 5.811, 'BRAM': 6, 'DSP': 0, 'FF': 413, 'LUT': 499, 'SLICE': 167, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 9.494, 'BRAM': 8, 'DSP': 0, 'FF': 2615, 'LUT': 2773, 'SLICE': 976, 'CLB': 0, 'URAM': 0, 'latency': 679976, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 6.151, 'BRAM': 4, 'DSP': 0, 'FF': 647, 'LUT': 458, 'SLICE': 207, 'CLB': 0, 'URAM': 0, 'latency': 886409, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 6.127, 'BRAM': 3, 'DSP': 0, 'FF': 183, 'LUT': 215, 'SLICE': 82, 'CLB': 0, 'URAM': 0, 'latency': 33935, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 11.689, 'BRAM': 2, 'DSP': 0, 'FF': 1262, 'LUT': 1555, 'SLICE': 560, 'CLB': 0, 'URAM': 0, 'latency': 679956, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 9.169, 'BRAM': 1, 'DSP': 0, 'FF': 228, 'LUT': 228, 'SLICE': 98, 'CLB': 0, 'URAM': 0, 'latency': 854407, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 7.256, 'BRAM': 6, 'DSP': 0, 'FF': 209, 'LUT': 307, 'SLICE': 104, 'CLB': 0, 'URAM': 0, 'latency': 33935, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 11.802, 'BRAM': 4, 'DSP': 0, 'FF': 1515, 'LUT': 2004, 'SLICE': 681, 'CLB': 0, 'URAM': 0, 'latency': 679981, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 8.147, 'BRAM': 2, 'DSP': 0, 'FF': 321, 'LUT': 304, 'SLICE': 117, 'CLB': 0, 'URAM': 0, 'latency': 860807, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 9.203, 'BRAM': 6, 'DSP': 0, 'FF': 261, 'LUT': 473, 'SLICE': 154, 'CLB': 0, 'URAM': 0, 'latency': 33935, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 12.833, 'BRAM': 8, 'DSP': 0, 'FF': 2069, 'LUT': 2941, 'SLICE': 982, 'CLB': 0, 'URAM': 0, 'latency': 679982, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 8.273, 'BRAM': 4, 'DSP': 0, 'FF': 461, 'LUT': 420, 'SLICE': 163, 'CLB': 0, 'URAM': 0, 'latency': 860807, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1}
+               ]
 
     torch_X_samples = torch.zeros([len(samples), 8])
-    torch_Y_samples = torch.zeros([len(samples), 6])
+    torch_Y_samples = torch.zeros([len(samples), 8])
 
     for i, sample in enumerate(samples):
         torch_X_samples[i, 0] = sample["clock"]
@@ -39,11 +41,13 @@ def getInterpolationData():
         torch_X_samples[i, 7] = sample["padding"]
 
         torch_Y_samples[i, 0] = sample["latency"]
-        torch_Y_samples[i, 1] = sample["BRAM_18K"]
+        torch_Y_samples[i, 1] = sample["BRAM"]
         torch_Y_samples[i, 2] = sample["DSP"]
         torch_Y_samples[i, 3] = sample["FF"]
         torch_Y_samples[i, 4] = sample["LUT"]
-        torch_Y_samples[i, 5] = 0  # sample["URAM"]
+        torch_Y_samples[i, 5] = sample["SLICE"]
+        torch_Y_samples[i, 6] = sample["CLB"]
+        torch_Y_samples[i, 7] = sample["URAM"]
 
     return torch_Y_samples, torch_X_samples
 

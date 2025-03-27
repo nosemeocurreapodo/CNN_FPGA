@@ -7,22 +7,26 @@ import layers
 
 # total for a pynq-z2
 def getTotalData():
-    total_dict = {"BRAM_18K": 280,
+    total_dict = {"BRAM": 280,
                   "DSP": 220,
                   "FF": 106400,
                   "LUT": 53200,
+                  "SLICE": 13300,
+                  "CLB": 0,
                   "URAM": 0}
-    total = torch.zeros([5])
-    total[0] = total_dict["BRAM_18K"]
+    total = torch.zeros([7])
+    total[0] = total_dict["BRAM"]
     total[1] = total_dict["DSP"]
     total[2] = total_dict["FF"]
     total[3] = total_dict["LUT"]
-    total[4] = total_dict["URAM"]
+    total[4] = total_dict["SLICE"]
+    total[5] = total_dict["CLB"]
+    total[6] = total_dict["URAM"]
     return total
 
 
 def isImplementable(M_data, x):
-    return torch.sum(torch.sigmoid(10.0*(M_data[:-1] - x[1:-1])/M_data[:-1]))
+    return torch.max(torch.clamp((x[1:-2] - 0.8*M_data[:-2])/M_data[:-2], 0))
 
 
 class VerySimpleDARTSNetwork(nn.Module):

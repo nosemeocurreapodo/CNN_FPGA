@@ -25,6 +25,7 @@ using data_type = ap_fixed<32, 16>;
 
 using packet_type = hls::axis<data_type, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false>;
 
+const int batch_size = BATCH_SIZE;
 const int in_channels = IN_CHANNELS;
 const int out_channels = OUT_CHANNELS;
 const int in_height = IN_HEIGHT;

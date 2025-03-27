@@ -1,6 +1,7 @@
 data_type_list = ["ap_fixed<2,1>",
                   "ap_fixed<4,2>",
                   "ap_fixed<8,4>"]
+batch_size_list = [32, 64, 128, 256]
 conv_param_list = [{"in_channels": 1, "out_channels": 32,
                     "in_height": 32, "in_width": 32,
                     "padding": 1},
