@@ -33,44 +33,80 @@ class VerySimpleDARTSNetwork(nn.Module):
     def __init__(self, num_classes=10, input_shape=(1, 32, 32)):
         super().__init__()
 
-        op_candidates_1 = [layers.Conv2D_3k_2b_HWNAS,
-                           layers.Conv2D_3k_4b_HWNAS,
-                           layers.Conv2D_3k_8b_HWNAS]
+        op_candidates_1 = [layers.Conv2D_3k_2W_2A_HWNAS,
+                           layers.Conv2D_3k_2W_4A_HWNAS,
+                           layers.Conv2D_3k_2W_8A_HWNAS,
+                           layers.Conv2D_3k_4W_2A_HWNAS,
+                           layers.Conv2D_3k_4W_4A_HWNAS,
+                           layers.Conv2D_3k_4W_8A_HWNAS,
+                           layers.Conv2D_3k_8W_2A_HWNAS,
+                           layers.Conv2D_3k_8W_4A_HWNAS,
+                           layers.Conv2D_3k_8W_8A_HWNAS]
         self.mixed_op_1 = layers.MixedConv2D(input_shape[0], 32,
                                              input_shape[1], input_shape[2],
                                              op_candidates_1)
 
-        op_candidates_2 = [layers.Conv2D_3k_2b_HWNAS,
-                           layers.Conv2D_3k_4b_HWNAS,
-                           layers.Conv2D_3k_8b_HWNAS]
+        op_candidates_2 = [layers.Conv2D_3k_2W_2A_HWNAS,
+                           layers.Conv2D_3k_2W_4A_HWNAS,
+                           layers.Conv2D_3k_2W_8A_HWNAS,
+                           layers.Conv2D_3k_4W_2A_HWNAS,
+                           layers.Conv2D_3k_4W_4A_HWNAS,
+                           layers.Conv2D_3k_4W_8A_HWNAS,
+                           layers.Conv2D_3k_8W_2A_HWNAS,
+                           layers.Conv2D_3k_8W_4A_HWNAS,
+                           layers.Conv2D_3k_8W_8A_HWNAS]
         self.mixed_op_2 = layers.MixedConv2D(32, 32,
                                              input_shape[1], input_shape[2],
                                              op_candidates_2)
 
-        op_candidates_3 = [layers.Conv2D_3k_2b_HWNAS,
-                           layers.Conv2D_3k_4b_HWNAS,
-                           layers.Conv2D_3k_8b_HWNAS]
+        op_candidates_3 = [layers.Conv2D_3k_2W_2A_HWNAS,
+                           layers.Conv2D_3k_2W_4A_HWNAS,
+                           layers.Conv2D_3k_2W_8A_HWNAS,
+                           layers.Conv2D_3k_4W_2A_HWNAS,
+                           layers.Conv2D_3k_4W_4A_HWNAS,
+                           layers.Conv2D_3k_4W_8A_HWNAS,
+                           layers.Conv2D_3k_8W_2A_HWNAS,
+                           layers.Conv2D_3k_8W_4A_HWNAS,
+                           layers.Conv2D_3k_8W_8A_HWNAS]
         self.mixed_op_3 = layers.MixedConv2D(32, 64,
                                              input_shape[1]/2, input_shape[2]/2,
                                              op_candidates_3)
 
-        op_candidates_4 = [layers.Conv2D_3k_2b_HWNAS,
-                           layers.Conv2D_3k_4b_HWNAS,
-                           layers.Conv2D_3k_8b_HWNAS]
+        op_candidates_4 = [layers.Conv2D_3k_2W_2A_HWNAS,
+                           layers.Conv2D_3k_2W_4A_HWNAS,
+                           layers.Conv2D_3k_2W_8A_HWNAS,
+                           layers.Conv2D_3k_4W_2A_HWNAS,
+                           layers.Conv2D_3k_4W_4A_HWNAS,
+                           layers.Conv2D_3k_4W_8A_HWNAS,
+                           layers.Conv2D_3k_8W_2A_HWNAS,
+                           layers.Conv2D_3k_8W_4A_HWNAS,
+                           layers.Conv2D_3k_8W_8A_HWNAS]
         self.mixed_op_4 = layers.MixedConv2D(64, 64,
                                              input_shape[1]/2, input_shape[2]/2,
                                              op_candidates_4)
 
-        op_candidates_5 = [layers.Conv2D_3k_2b_HWNAS,
-                           layers.Conv2D_3k_4b_HWNAS,
-                           layers.Conv2D_3k_8b_HWNAS]
+        op_candidates_5 = [layers.Conv2D_3k_2W_2A_HWNAS,
+                           layers.Conv2D_3k_2W_4A_HWNAS,
+                           layers.Conv2D_3k_2W_8A_HWNAS,
+                           layers.Conv2D_3k_4W_2A_HWNAS,
+                           layers.Conv2D_3k_4W_4A_HWNAS,
+                           layers.Conv2D_3k_4W_8A_HWNAS,
+                           layers.Conv2D_3k_8W_2A_HWNAS,
+                           layers.Conv2D_3k_8W_4A_HWNAS,
+                           layers.Conv2D_3k_8W_8A_HWNAS]
         self.mixed_op_5 = layers.MixedConv2D(64, 128,
                                              input_shape[1]/4, input_shape[2]/4,
                                              op_candidates_5)
 
-        op_candidates_6 = [layers.Conv2D_3k_2b_HWNAS,
-                           layers.Conv2D_3k_4b_HWNAS,
-                           layers.Conv2D_3k_8b_HWNAS]
+        op_candidates_6 = [layers.Conv2D_3k_2W_2A_HWNAS,
+                           layers.Conv2D_3k_2W_4A_HWNAS,
+                           layers.Conv2D_3k_2W_8A_HWNAS,
+                           layers.Conv2D_3k_4W_2A_HWNAS,
+                           layers.Conv2D_3k_4W_4A_HWNAS,
+                           layers.Conv2D_3k_4W_8A_HWNAS,
+                           layers.Conv2D_3k_8W_2A_HWNAS,
+                           layers.Conv2D_3k_8W_4A_HWNAS,
+                           layers.Conv2D_3k_8W_8A_HWNAS]
         self.mixed_op_6 = layers.MixedConv2D(128, 128,
                                              input_shape[1]/4, input_shape[2]/4,
                                              op_candidates_6)
@@ -121,6 +157,10 @@ class VerySimpleDARTSNetwork(nn.Module):
         """Return a list of architecture parameters (alphas) to be optimized separately."""
         return self.getHardwareResults()[0]
 
+    def getSlices(self):
+        """Return a list of architecture parameters (alphas) to be optimized separately."""
+        return self.getHardwareResults()[5]
+    
     def getImplementability(self):
         used_hardware = self.getHardwareResults()
         implementability = isImplementable(self.max_hardware, used_hardware)

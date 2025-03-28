@@ -959,7 +959,7 @@ class QuantWrapperFixedPoint(nn.Module):
 
 
 class QuantWrapperFixedPoint2(nn.Module):
-    def __init__(self, module, bits=32, optimizeQuant=False):
+    def __init__(self, module, weight_bits=32, act_bits=32, optimizeQuant=False):
         super().__init__()
         self.module = module
 
@@ -967,11 +967,11 @@ class QuantWrapperFixedPoint2(nn.Module):
         self.weight_observer = MinMaxObserver()
         self.bias_observer = MinMaxObserver()
 
-        self.input_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))),
+        self.input_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(act_bits))),
                                              requires_grad=optimizeQuant)
-        self.weight_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))),
+        self.weight_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(weight_bits))),
                                               requires_grad=optimizeQuant)
-        self.bias_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))),
+        self.bias_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(weight_bits))),
                                             requires_grad=False)
 
         # self.output_bits_param = nn.Parameter(bit_to_param(torch.tensor(float(bits))), requires_grad=optimizeQuant)

@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -6,39 +7,52 @@ import fake_quantization as fake_quantization
 
 
 def getInterpolationData():
-    samples = [
-                {'clock': 5.884, 'BRAM': 3, 'DSP': 0, 'FF': 247, 'LUT': 267, 'SLICE': 104, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-                {'clock': 8.087, 'BRAM': 2, 'DSP': 0, 'FF': 1304, 'LUT': 1509, 'SLICE': 544, 'CLB': 0, 'URAM': 0, 'latency': 679959, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-                {'clock': 5.766, 'BRAM': 1, 'DSP': 0, 'FF': 311, 'LUT': 254, 'SLICE': 106, 'CLB': 0, 'URAM': 0, 'latency': 867209, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-                {'clock': 6.157, 'BRAM': 6, 'DSP': 0, 'FF': 302, 'LUT': 353, 'SLICE': 118, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-                {'clock': 9.051, 'BRAM': 4, 'DSP': 0, 'FF': 1639, 'LUT': 1922, 'SLICE': 668, 'CLB': 0, 'URAM': 0, 'latency': 679983, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-                {'clock': 5.726, 'BRAM': 2, 'DSP': 0, 'FF': 423, 'LUT': 330, 'SLICE': 137, 'CLB': 0, 'URAM': 0, 'latency': 873609, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-                {'clock': 5.811, 'BRAM': 6, 'DSP': 0, 'FF': 413, 'LUT': 499, 'SLICE': 167, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-                {'clock': 9.494, 'BRAM': 8, 'DSP': 0, 'FF': 2615, 'LUT': 2773, 'SLICE': 976, 'CLB': 0, 'URAM': 0, 'latency': 679976, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-                {'clock': 6.151, 'BRAM': 4, 'DSP': 0, 'FF': 647, 'LUT': 458, 'SLICE': 207, 'CLB': 0, 'URAM': 0, 'latency': 886409, 'part': 'xc7z020clg400-1', 'period': 10, 'bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-                {'clock': 6.127, 'BRAM': 3, 'DSP': 0, 'FF': 183, 'LUT': 215, 'SLICE': 82, 'CLB': 0, 'URAM': 0, 'latency': 33935, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-                {'clock': 11.689, 'BRAM': 2, 'DSP': 0, 'FF': 1262, 'LUT': 1555, 'SLICE': 560, 'CLB': 0, 'URAM': 0, 'latency': 679956, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-                {'clock': 9.169, 'BRAM': 1, 'DSP': 0, 'FF': 228, 'LUT': 228, 'SLICE': 98, 'CLB': 0, 'URAM': 0, 'latency': 854407, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-                {'clock': 7.256, 'BRAM': 6, 'DSP': 0, 'FF': 209, 'LUT': 307, 'SLICE': 104, 'CLB': 0, 'URAM': 0, 'latency': 33935, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-                {'clock': 11.802, 'BRAM': 4, 'DSP': 0, 'FF': 1515, 'LUT': 2004, 'SLICE': 681, 'CLB': 0, 'URAM': 0, 'latency': 679981, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-                {'clock': 8.147, 'BRAM': 2, 'DSP': 0, 'FF': 321, 'LUT': 304, 'SLICE': 117, 'CLB': 0, 'URAM': 0, 'latency': 860807, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
-                {'clock': 9.203, 'BRAM': 6, 'DSP': 0, 'FF': 261, 'LUT': 473, 'SLICE': 154, 'CLB': 0, 'URAM': 0, 'latency': 33935, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
-                {'clock': 12.833, 'BRAM': 8, 'DSP': 0, 'FF': 2069, 'LUT': 2941, 'SLICE': 982, 'CLB': 0, 'URAM': 0, 'latency': 679982, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
-                {'clock': 8.273, 'BRAM': 4, 'DSP': 0, 'FF': 461, 'LUT': 420, 'SLICE': 163, 'CLB': 0, 'URAM': 0, 'latency': 860807, 'part': 'xc7z020clg400-1', 'period': 20, 'bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1}
+    
+    all_samples = [
+                {'clock': 6.244, 'BRAM': 3, 'DSP': 0, 'FF': 247, 'LUT': 266, 'SLICE': 92, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 8.087, 'BRAM': 2, 'DSP': 0, 'FF': 1304, 'LUT': 1509, 'SLICE': 544, 'CLB': 0, 'URAM': 0, 'latency': 679959, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.766, 'BRAM': 1, 'DSP': 0, 'FF': 311, 'LUT': 254, 'SLICE': 106, 'CLB': 0, 'URAM': 0, 'latency': 867209, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 5.053, 'BRAM': 3, 'DSP': 0, 'FF': 286, 'LUT': 297, 'SLICE': 110, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 8.862, 'BRAM': 4, 'DSP': 0, 'FF': 1702, 'LUT': 1858, 'SLICE': 689, 'CLB': 0, 'URAM': 0, 'latency': 679956, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.247, 'BRAM': 2, 'DSP': 0, 'FF': 402, 'LUT': 296, 'SLICE': 122, 'CLB': 0, 'URAM': 0, 'latency': 873609, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 4.995, 'BRAM': 3, 'DSP': 0, 'FF': 354, 'LUT': 373, 'SLICE': 132, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 9.228, 'BRAM': 8, 'DSP': 0, 'FF': 2451, 'LUT': 2534, 'SLICE': 881, 'CLB': 0, 'URAM': 0, 'latency': 679970, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.913, 'BRAM': 4, 'DSP': 0, 'FF': 586, 'LUT': 385, 'SLICE': 172, 'CLB': 0, 'URAM': 0, 'latency': 886409, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 2, 'act_bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 6.244, 'BRAM': 3, 'DSP': 0, 'FF': 247, 'LUT': 266, 'SLICE': 92, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 8.755, 'BRAM': 2, 'DSP': 0, 'FF': 1304, 'LUT': 1510, 'SLICE': 542, 'CLB': 0, 'URAM': 0, 'latency': 679959, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.216, 'BRAM': 1, 'DSP': 0, 'FF': 311, 'LUT': 258, 'SLICE': 107, 'CLB': 0, 'URAM': 0, 'latency': 867209, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 5.977, 'BRAM': 6, 'DSP': 0, 'FF': 302, 'LUT': 352, 'SLICE': 130, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 9.051, 'BRAM': 4, 'DSP': 0, 'FF': 1639, 'LUT': 1922, 'SLICE': 668, 'CLB': 0, 'URAM': 0, 'latency': 679983, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.726, 'BRAM': 2, 'DSP': 0, 'FF': 423, 'LUT': 330, 'SLICE': 137, 'CLB': 0, 'URAM': 0, 'latency': 873609, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 5.671, 'BRAM': 6, 'DSP': 0, 'FF': 443, 'LUT': 501, 'SLICE': 176, 'CLB': 0, 'URAM': 0, 'latency': 33940, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 9.128, 'BRAM': 8, 'DSP': 0, 'FF': 2601, 'LUT': 2646, 'SLICE': 978, 'CLB': 0, 'URAM': 0, 'latency': 679975, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 8, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.766, 'BRAM': 4, 'DSP': 0, 'FF': 637, 'LUT': 457, 'SLICE': 216, 'CLB': 0, 'URAM': 0, 'latency': 886409, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 4, 'act_bits': 8, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 6.244, 'BRAM': 3, 'DSP': 0, 'FF': 247, 'LUT': 266, 'SLICE': 92, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 8, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 9.121, 'BRAM': 2, 'DSP': 0, 'FF': 1304, 'LUT': 1510, 'SLICE': 536, 'CLB': 0, 'URAM': 0, 'latency': 679959, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 8, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.345, 'BRAM': 1, 'DSP': 0, 'FF': 311, 'LUT': 257, 'SLICE': 107, 'CLB': 0, 'URAM': 0, 'latency': 867209, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 8, 'act_bits': 2, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 5.977, 'BRAM': 6, 'DSP': 0, 'FF': 302, 'LUT': 352, 'SLICE': 130, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 8, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1},
+                {'clock': 9.215, 'BRAM': 4, 'DSP': 0, 'FF': 1639, 'LUT': 1922, 'SLICE': 663, 'CLB': 0, 'URAM': 0, 'latency': 679983, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 8, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 32, 'out_channels': 64, 'in_height': 16, 'in_width': 16, 'padding': 1},
+                {'clock': 5.653, 'BRAM': 2, 'DSP': 0, 'FF': 425, 'LUT': 329, 'SLICE': 141, 'CLB': 0, 'URAM': 0, 'latency': 873609, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 8, 'act_bits': 4, 'kernel_size': 3, 'in_channels': 64, 'out_channels': 128, 'in_height': 8, 'in_width': 8, 'padding': 1},
+                {'clock': 5.597, 'BRAM': 6, 'DSP': 0, 'FF': 413, 'LUT': 498, 'SLICE': 177, 'CLB': 0, 'URAM': 0, 'latency': 33939, 'part': 'xc7z020clg400-1', 'period': '10', 'weight_bits': 8, 'act_bits': 8, 'kernel_size': 3, 'in_channels': 1, 'out_channels': 32, 'in_height': 32, 'in_width': 32, 'padding': 1}
                ]
-
-    torch_X_samples = torch.zeros([len(samples), 8])
+    
+    probabilities = np.ones((len(all_samples))) / len(all_samples)
+    
+    samples = np.random.choice(all_samples, size=6, replace=True, p = probabilities)
+     
+    torch_X_samples = torch.zeros([len(samples), 9])
     torch_Y_samples = torch.zeros([len(samples), 8])
 
     for i, sample in enumerate(samples):
         torch_X_samples[i, 0] = sample["clock"]
-        torch_X_samples[i, 1] = sample["bits"]
-        torch_X_samples[i, 2] = sample["in_channels"]
-        torch_X_samples[i, 3] = sample["out_channels"]
-        torch_X_samples[i, 4] = sample["in_width"]
-        torch_X_samples[i, 5] = sample["in_height"]
-        torch_X_samples[i, 6] = sample["kernel_size"]
-        torch_X_samples[i, 7] = sample["padding"]
+        torch_X_samples[i, 1] = sample["weight_bits"]
+        torch_X_samples[i, 2] = sample["act_bits"]
+        torch_X_samples[i, 3] = sample["in_channels"]
+        torch_X_samples[i, 4] = sample["out_channels"]
+        torch_X_samples[i, 5] = sample["in_width"]
+        torch_X_samples[i, 6] = sample["in_height"]
+        torch_X_samples[i, 7] = sample["kernel_size"]
+        torch_X_samples[i, 8] = sample["padding"]
 
         torch_Y_samples[i, 0] = sample["latency"]
         torch_Y_samples[i, 1] = sample["BRAM"]
@@ -76,7 +90,7 @@ def conv2D_3x3_estimate_params(Y_data, X_data, x):
 
 
 class Conv2DHWNAS(nn.Module):
-    def __init__(self, bits, use_relu,
+    def __init__(self, weight_bits, act_bits, use_relu,
                  in_channels, out_channels,
                  in_width, in_height,
                  kernel_size,
@@ -87,16 +101,19 @@ class Conv2DHWNAS(nn.Module):
                             nn.Conv2d(in_channels, out_channels,
                                       kernel_size=kernel_size,
                                       padding=padding,
-                                      bias=bias), bits, False)
-        self.bits = bits
+                                      bias=bias),
+                            weight_bits, act_bits, False)
+        self.weight_bits = weight_bits
+        self.act_bits = act_bits
         self.use_relu = use_relu
         Y_data, X_data = getInterpolationData()
         # self.Y_data = Y_data
         # self.X_data = X_data
 
-        x = torch.zeros([8])
+        x = torch.zeros([9])
         x[0] = 10
-        x[1] = bits
+        x[1] = weight_bits
+        x[2] = act_bits
         x[2] = in_channels
         x[3] = out_channels
         x[4] = in_width
@@ -125,73 +142,82 @@ class Conv2DHWNAS(nn.Module):
         return est_params
 
 
-class Conv2D_1k_8b_HWNAS(Conv2DHWNAS):
+class Conv2D_3k_2W_2A_HWNAS(Conv2DHWNAS):
     def __init__(self, in_channels, out_channels,
                  in_width, in_height):
-        super().__init__(8, True,
-                         in_channels, out_channels,
-                         in_width, in_height,
-                         1, 0, False)
-
-
-class Conv2D_1k_16b_HWNAS(Conv2DHWNAS):
-    def __init__(self, in_channels, out_channels,
-                 in_width, in_height):
-        super().__init__(16, True,
-                         in_channels, out_channels,
-                         in_width, in_height,
-                         1, 0, False)
-
-
-class Conv2D_1k_32b_HWNAS(Conv2DHWNAS):
-    def __init__(self, in_channels, out_channels,
-                 in_width, in_height):
-        super().__init__(32, True,
-                         in_channels, out_channels,
-                         in_width, in_height,
-                         1, 0, False)
-
-
-class Conv2D_3k_2b_HWNAS(Conv2DHWNAS):
-    def __init__(self, in_channels, out_channels,
-                 in_width, in_height):
-        super().__init__(2, True,
+        super().__init__(2, 2, True,
                          in_channels, out_channels,
                          in_width, in_height,
                          3, 1, False)
 
 
-class Conv2D_3k_4b_HWNAS(Conv2DHWNAS):
+class Conv2D_3k_2W_4A_HWNAS(Conv2DHWNAS):
     def __init__(self, in_channels, out_channels,
                  in_width, in_height):
-        super().__init__(4, True,
+        super().__init__(2, 4, True,
                          in_channels, out_channels,
                          in_width, in_height,
                          3, 1, False)
 
 
-class Conv2D_3k_8b_HWNAS(Conv2DHWNAS):
+class Conv2D_3k_2W_8A_HWNAS(Conv2DHWNAS):
     def __init__(self, in_channels, out_channels,
                  in_width, in_height):
-        super().__init__(8, True,
+        super().__init__(2, 8, True,
                          in_channels, out_channels,
                          in_width, in_height,
                          3, 1, False)
 
 
-class Conv2D_3k_16b_HWNAS(Conv2DHWNAS):
+class Conv2D_3k_4W_2A_HWNAS(Conv2DHWNAS):
     def __init__(self, in_channels, out_channels,
                  in_width, in_height):
-        super().__init__(16, True,
+        super().__init__(4, 2, True,
                          in_channels, out_channels,
                          in_width, in_height,
                          3, 1, False)
 
 
-class Conv2D_3k_32b_HWNAS(Conv2DHWNAS):
+class Conv2D_3k_4W_4A_HWNAS(Conv2DHWNAS):
     def __init__(self, in_channels, out_channels,
                  in_width, in_height):
-        super().__init__(32, True,
+        super().__init__(4, 4, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1, False)
+
+
+class Conv2D_3k_4W_8A_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(4, 8, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1, False)
+
+
+class Conv2D_3k_8W_2A_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(8, 2, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1, False)
+
+
+class Conv2D_3k_8W_4A_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(8, 4, True,
+                         in_channels, out_channels,
+                         in_width, in_height,
+                         3, 1, False)
+
+
+class Conv2D_3k_8W_8A_HWNAS(Conv2DHWNAS):
+    def __init__(self, in_channels, out_channels,
+                 in_width, in_height):
+        super().__init__(8, 8, True,
                          in_channels, out_channels,
                          in_width, in_height,
                          3, 1, False)

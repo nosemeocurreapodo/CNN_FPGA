@@ -12,7 +12,7 @@ import hardware as hardware
 
 def main(iterations=50):
 
-    batch_size = 32
+    batch_size = 512
 
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
@@ -114,7 +114,8 @@ def main(iterations=50):
                         train_data_loader,
                         optimizer_all,
                         criterion,
-                        lambda_latency=1e-7,  # max(step*0.01, 0.1),
+                        lambda_latency=0.0, #  1e-7,  # max(step*0.01, 0.1),
+                        lambda_slices=1.0,
                         lambda_implementability=1.0,
                         train=True
                     )
@@ -125,7 +126,8 @@ def main(iterations=50):
                         test_data_loader,
                         optimizer_all,
                         criterion,
-                        lambda_latency=1e-7,  # max(step*0.01, 0.1),
+                        lambda_latency=0.0, #  1e-7,  # max(step*0.01, 0.1),
+                        lambda_slices=1.0,
                         lambda_implementability=1.0,
                         train=False
                     )
@@ -143,6 +145,7 @@ def main(iterations=50):
                       f"Lat loss: {train_loss_latency:.4f}")
                 for index, layer in enumerate(MixedOpLayersList):
                     print(f"Alpha {index}: {layer.alpha.data}")
+                    print(f"Weights {index}:{F.softmax(layer.alpha.data, dim=0)}")
             print("hardware results: ", model.getHardwareResults())
             print("isImplementable: ", model.getImplementability())
 
