@@ -38,7 +38,7 @@ def getInterpolationData():
     
     probabilities = np.ones((len(all_samples))) / len(all_samples)
     
-    samples = np.random.choice(all_samples, size=6, replace=True, p = probabilities)
+    samples = np.random.choice(all_samples, size=len(all_samples), replace=True, p = probabilities)
      
     torch_X_samples = torch.zeros([len(samples), 9])
     torch_Y_samples = torch.zeros([len(samples), 8])

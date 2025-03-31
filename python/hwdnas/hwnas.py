@@ -115,7 +115,7 @@ def main(iterations=50):
                         optimizer_all,
                         criterion,
                         lambda_latency=0.0, #  1e-7,  # max(step*0.01, 0.1),
-                        lambda_slices=1.0,
+                        lambda_slices=0.0001,
                         lambda_implementability=1.0,
                         train=True
                     )
@@ -127,7 +127,7 @@ def main(iterations=50):
                         optimizer_all,
                         criterion,
                         lambda_latency=0.0, #  1e-7,  # max(step*0.01, 0.1),
-                        lambda_slices=1.0,
+                        lambda_slices=0.0001,
                         lambda_implementability=1.0,
                         train=False
                     )
