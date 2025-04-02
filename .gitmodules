@@ -1,0 +1,3 @@
+[submodule "HLSLinearAlgebra"]
+	path = HLSLinearAlgebra
+	url = https://github.com/nosemeocurreapodo/HLSLinearAlgebra.git
