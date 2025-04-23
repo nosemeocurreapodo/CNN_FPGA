@@ -5,7 +5,7 @@
 // #include "ap_int.h"
 #include "ap_fixed.h"
 #include "ap_float.h"
-#include "HLSLinearAlgebra/src/floatX.h"
+//#include "floatX.h"
 
 #if W_DATA_TYPE == 1
 using w_data_type = ap_fixed<1, 1>;
@@ -75,8 +75,9 @@ using in_packet_type = hls::axis<in_data_type, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS
 using out_packet_type = hls::axis<out_data_type, 0, 0, 0, (AXIS_ENABLE_KEEP | AXIS_ENABLE_LAST | AXIS_ENABLE_STRB), false>;
 
 const int batch_size = BATCH_SIZE;
-const int in_size = IN_CHANNELS;
-const int out_size = OUT_CHANNELS;
+const int in_channels = IN_CHANNELS;
+const int out_channels = OUT_CHANNELS;
 const int in_height = IN_HEIGHT;
 const int in_width = IN_WIDTH;
+const int padding = PADDING;
 const bool use_relu = USE_RELU;

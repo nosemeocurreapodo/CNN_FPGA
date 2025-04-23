@@ -103,6 +103,7 @@ for layer in layers_list:
                                   f"-DTOP_NAME={component_name} "
                                   f"-DUSE_RELU={use_relu} "
                                   f"-DW_DATA_TYPE={w_data_type} "
+                                  f"-DB_DATA_TYPE={w_data_type} "
                                   f"-DIN_DATA_TYPE={in_data_type} "
                                   f"-DOUT_DATA_TYPE={out_data_type} "
                                   f"-DBATCH_SIZE={batch_size} "
@@ -111,8 +112,9 @@ for layer in layers_list:
                                   f"-DIN_HEIGHT={in_height} "
                                   f"-DIN_WIDTH={in_width} "
                                   f"-DPADDING={padding} "
-                                  "-I../../../common "
-                                  "-I../../../HLSLinearAlgebra/src"))
+                                  # "-std=c++17 "
+                                  f"-I{cwd}../../common "
+                                  f"-I{cwd}../../../HLSLinearAlgebra/src"))
     cfg_file.set_values(section='hls', key='tb.file',
                         values=[cwd+'conv2d_3x3_test.cpp'])
     cfg_file.set_value(section='hls', key='tb.file_cflags',
@@ -120,6 +122,7 @@ for layer in layers_list:
                                   f"-DTOP_NAME={component_name} "
                                   f"-DUSE_RELU={use_relu} "
                                   f"-DW_DATA_TYPE={w_data_type} "
+                                  f"-DB_DATA_TYPE={w_data_type} "
                                   f"-DIN_DATA_TYPE={in_data_type} "
                                   f"-DOUT_DATA_TYPE={out_data_type} "
                                   f"-DBATCH_SIZE={batch_size} "
@@ -128,6 +131,7 @@ for layer in layers_list:
                                   f"-DIN_HEIGHT={in_height} "
                                   f"-DIN_WIDTH={in_width} "
                                   f"-DPADDING={padding} "
+                                  # "-std=c++17 "
                                   "-I../../../common "
                                   "-I../../../HLSLinearAlgebra/src "
                                   "-I/usr/include/opencv4 "

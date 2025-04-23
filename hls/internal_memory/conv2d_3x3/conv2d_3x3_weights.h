@@ -1,6 +1,7 @@
 #pragma once
 
 #include "conv2d_3x3_params.h"
+#include "linalg.h"
 
 const w_data_type kernel_identity[3 * 3] = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
 const w_data_type kernel_sobel_py[3 * 3] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
@@ -9,34 +10,34 @@ const w_data_type kernel_sobel_px[3 * 3] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0,
 const w_data_type kernel_sobel_nx[3 * 3] = {-1.0, 0.0, 1.0, -2.0, 0.0, 2.0, -1.0, 0.0, 1.0};
 const w_data_type kernel_laplacian[3 * 3] = {0.0, 1.0, 0.0, 1.0, -4.0, 1.0, 0.0, 1.0, 0.0};
 
-inline void Conv2D3x3Weights(mat3<w_data_type> kernel[in_channels][out_channels])
+inline void Conv2d3x3Weights(linalg::Mat3<w_data_type> kernel[in_channels][out_channels])
 {
     for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
         for (int out_channel = 0; out_channel < out_channels; out_channel++)
         {
             int index = in_channel * out_channels + out_channel;
-            mat3<w_data_type> mat_touse; //(kernel_identity);
+            linalg::Mat3<w_data_type> mat_touse; //(kernel_identity);
 
             if (index % 6 == 0)
-                mat_touse = mat3<w_data_type>(kernel_identity);
+                mat_touse = linalg::Mat3<w_data_type>(kernel_identity);
             if (index % 6 == 1)
-                mat_touse = mat3<w_data_type>(kernel_sobel_py);
+                mat_touse = linalg::Mat3<w_data_type>(kernel_sobel_py);
             if (index % 6 == 2)
-                mat_touse = mat3<w_data_type>(kernel_sobel_px);
+                mat_touse = linalg::Mat3<w_data_type>(kernel_sobel_px);
             if (index % 6 == 3)
-                mat_touse = mat3<w_data_type>(kernel_sobel_ny);
+                mat_touse = linalg::Mat3<w_data_type>(kernel_sobel_ny);
             if (index % 6 == 4)
-                mat_touse = mat3<w_data_type>(kernel_sobel_nx);
+                mat_touse = linalg::Mat3<w_data_type>(kernel_sobel_nx);
             if (index % 6 == 5)
-                mat_touse = mat3<w_data_type>(kernel_laplacian);
+                mat_touse = linalg::Mat3<w_data_type>(kernel_laplacian);
 
             kernel[in_channel][out_channel] = mat_touse;
         }
     }
 }
 
-inline void Conv2D3x3RandomWeights(w_data_type kernel[in_channels * out_channels * 3 * 3])
+inline void Conv2d3x3RandomWeights(w_data_type kernel[in_channels * out_channels * 3 * 3])
 {
     for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
@@ -55,7 +56,7 @@ inline void Conv2D3x3RandomWeights(w_data_type kernel[in_channels * out_channels
     }
 }
 
-inline void Conv2D3x3RandomWeights(mat3<w_data_type> kernel[in_channels][out_channels])
+inline void Conv2d3x3RandomWeights(linalg::Mat3<w_data_type> kernel[in_channels][out_channels])
 {
     for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
@@ -66,7 +67,7 @@ inline void Conv2D3x3RandomWeights(mat3<w_data_type> kernel[in_channels][out_cha
                 for (int x = 0; x < 3; x++)
                 {
                     int index = in_channel * out_channels + out_channel * 3 * 3 + y * 3 + x;
-                    kernel[in_channel][out_channel].data[y][x] = w_data_type(float(index) / 10.0);
+                    kernel[in_channel][out_channel](y, x) = w_data_type(float(index) / 10.0);
                 }
             }
         }

@@ -1,16 +1,16 @@
 #pragma once
 
-#include "HLSLinearAlgebra/src/types.h"
+#include "linalg.h"
 
 template <typename type, int size>
-class shift_register
+class ShiftRegister
 {
 public:
-    shift_register()
+    ShiftRegister()
     {
     }
 
-    type shift_down(type val_in)
+    type ShiftDown(type val_in)
     {
         // #pragma HLS INLINE
 
@@ -34,28 +34,28 @@ private:
 };
 
 template <typename type, int size>
-class shift_mat3
+class ShiftMat3
 {
 public:
-    shift_mat3()
+    ShiftMat3()
     {
     }
 
-    void shift_down(type val)
+    void ShiftDown(type val)
     {
         type m20 = matrix(2, 0);
         matrix(2, 0) = matrix(2, 1);
         matrix(2, 1) = matrix(2, 2);
         matrix(2, 2) = val;
 
-        type line2_val = line2.shift_down(m20);
+        type line2_val = line2.ShiftDown(m20);
 
         type m10 = matrix(1, 0);
         matrix(1, 0) = matrix(1, 1);
         matrix(1, 1) = matrix(1, 2);
         matrix(1, 2) = line2_val;
 
-        type line1_val = line1.shift_down(m10);
+        type line1_val = line1.ShiftDown(m10);
 
         // type m00 = matrix(0, 0);
         matrix(0, 0) = matrix(0, 1);
@@ -63,44 +63,44 @@ public:
         matrix(0, 2) = line1_val;
     }
 
-    mat3<type> getMat()
+    linalg::Mat3<type> GetMat()
     {
         return matrix;
     }
 
 private:
-    shift_register<type, size - 3> line1;
-    shift_register<type, size - 3> line2;
-    mat3<type> matrix;
+    ShiftRegister<type, size - 3> line1;
+    ShiftRegister<type, size - 3> line2;
+    linalg::Mat3<type> matrix;
 };
 
 template <typename type, int size>
-class shift_mat2
+class ShiftMat2
 {
 public:
-    shift_mat2()
+    ShiftMat2()
     {
     }
 
-    void shift_down(type val)
+    void ShiftDown(type val)
     {
         type m10 = matrix(1, 0);
         matrix(1, 0) = matrix(1, 1);
         matrix(1, 1) = val;
 
-        type line_val = line.shift_down(m10);
+        type line_val = line.ShiftDown(m10);
 
         // type m10 = matrix(1, 0);
         matrix(0, 0) = matrix(0, 1);
         matrix(0, 1) = line_val;
     }
 
-    mat2<type> getMat()
+    linalg::Mat2<type> GetMat()
     {
         return matrix;
     }
 
 private:
-    shift_register<type, size - 2> line;
-    mat2<type> matrix;
+    ShiftRegister<type, size - 2> line;
+    linalg::Mat2<type> matrix;
 };

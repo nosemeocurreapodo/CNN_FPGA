@@ -3,9 +3,10 @@
 #include "ap_axi_sdata.h"
 #include "hls_stream.h"
 #include "linalg.h"
+#include "shift_registers.h"
 
 template <typename w_data_type, typename in_data_type, typename out_data_type, typename in_packet_type, typename out_packet_type, bool use_relu, int batch_size, int in_channels, int out_channels, int in_height, int in_width, int padding>
-int Conv2D3x3IMBase(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output, const mat3<w_data_type> kernel[in_channels][out_channels])
+int Conv2D3x3IMBase(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output, const linalg::Mat3<w_data_type> kernel[in_channels][out_channels])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
@@ -16,7 +17,7 @@ int Conv2D3x3IMBase(hls::stream<in_packet_type> &input, hls::stream<out_packet_t
 
     out_data_type out_buffer[out_channels][out_height][out_width];
 
-    shift_mat3<in_data_type, in_width + padding * 2> shift_reg;
+    ShiftMat3<in_data_type, in_width + padding * 2> shift_reg;
     // #pragma HLS ARRAY_PARTITION variable=shift_reg.data dim=1 factor=5 type=cyclic
     //  #pragma HLS ARRAY_PARTITION variable = in_buffer complete dim = 2
 
@@ -37,20 +38,21 @@ batch_size_loop:
                     in_data_type in_data = in_data_type(0.0f);
                     if (x >= 0 && x < in_width && y >= 0 && y < in_height)
                     {
-                        packet_type in_packet;
+                        in_packet_type in_packet;
                         input.read(in_packet);
                         in_data = in_packet.data;
                     }
                     // if (in_packet.last == 1)
                     //     last_was_read = true;
 
-                    shift_reg.shift_down(in_data);
-                    mat3<in_data_type> data = shift_reg.getMat();
+                    shift_reg.ShiftDown(in_data);
+                    linalg::Mat3<in_data_type> data = shift_reg.GetMat();
 
                 main_out_channel_loop:
                     for (int out_channel = 0; out_channel < out_channels; out_channel++)
                     {
-                        a_data_type conv = data.template mul_v2<out_data_type, w_data_type>(kernel[in_channel][out_channel]);
+                        // out_data_type conv = data.template mul_v2<out_data_type, w_data_type>(kernel[in_channel][out_channel]);
+                        out_data_type conv = data.template conv<out_data_type, w_data_type>(kernel[in_channel][out_channel]);
 
                         /*
                         packet_type out_packet;
@@ -93,7 +95,7 @@ batch_size_loop:
                         if (out_data < out_data_type(0.0f))
                             out_data = out_data_type(0.0f);
 
-                    packet_type out_packet;
+                    out_packet_type out_packet;
                     out_packet.data = out_data;
                     out_packet.keep = -1;
                     out_packet.strb = -1;
