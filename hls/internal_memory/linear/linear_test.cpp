@@ -5,8 +5,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "conv2D_3x3_IM.h"
-#include "conv2D_3x3_IM_params.h"
+#include "linear.h"
+#include "linear_params.h"
 
 int main(int argc, char *argv[])
 {

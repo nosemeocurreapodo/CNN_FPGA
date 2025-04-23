@@ -1,6 +1,6 @@
 #pragma once
 
-#include "conv2D_3x3_IM_params.h"
+#include "conv2d_3x3_params.h"
 
 const w_data_type kernel_identity[3 * 3] = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
 const w_data_type kernel_sobel_py[3 * 3] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
@@ -9,7 +9,7 @@ const w_data_type kernel_sobel_px[3 * 3] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0,
 const w_data_type kernel_sobel_nx[3 * 3] = {-1.0, 0.0, 1.0, -2.0, 0.0, 2.0, -1.0, 0.0, 1.0};
 const w_data_type kernel_laplacian[3 * 3] = {0.0, 1.0, 0.0, 1.0, -4.0, 1.0, 0.0, 1.0, 0.0};
 
-inline void conv2D_3x3_IM_weights(mat3<w_data_type> kernel[in_channels][out_channels])
+inline void Conv2D3x3Weights(mat3<w_data_type> kernel[in_channels][out_channels])
 {
     for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
@@ -36,7 +36,7 @@ inline void conv2D_3x3_IM_weights(mat3<w_data_type> kernel[in_channels][out_chan
     }
 }
 
-inline void conv2D_3x3_random_weights(w_data_type kernel[in_channels * out_channels * 3 * 3])
+inline void Conv2D3x3RandomWeights(w_data_type kernel[in_channels * out_channels * 3 * 3])
 {
     for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
@@ -55,7 +55,7 @@ inline void conv2D_3x3_random_weights(w_data_type kernel[in_channels * out_chann
     }
 }
 
-inline void conv2D_3x3_random_weights(mat3<w_data_type> kernel[in_channels][out_channels])
+inline void Conv2D3x3RandomWeights(mat3<w_data_type> kernel[in_channels][out_channels])
 {
     for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {

@@ -1,8 +1,8 @@
 #include "hls_stream.h"
 
-#include "conv2D_3x3_IM_base.h"
-#include "conv2D_3x3_IM_params.h"
-#include "conv2D_3x3_IM_weights.h"
+#include "conv2d_3x3_base.h"
+#include "conv2d_3x3_params.h"
+#include "conv2d_3x3_weights.h"
 
 int TOP_NAME(hls::stream<packet_type> &input, hls::stream<packet_type> &output)
 {
@@ -15,9 +15,9 @@ int TOP_NAME(hls::stream<packet_type> &input, hls::stream<packet_type> &output)
     mat3<w_data_type> weights[in_channels][out_channels];
     #pragma HLS ARRAY_PARTITION variable = weights complete dim = 0
 
-    conv2D_3x3_IM_weights(weights);
+    Conv2d3x3Weights(weights);
 
-    return conv2D_3x3_IM_base<w_data_type,
+    return Conv2D3x3IMBase<w_data_type,
                               a_data_type,
                               packet_type,
                               use_relu,

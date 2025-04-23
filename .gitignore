@@ -1,10 +1,11 @@
 /data
 /hls/results
-/hls/conv2D_3x3_IM/vitis_workspace
 /python/hwdnas/data
 /vitis_workspace
 /vivado_workspace
-/HLSLinearAlgebra
+*/vitis_workspace
+*/vivado_workspace
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
