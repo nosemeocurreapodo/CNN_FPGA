@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
         diffMat[out_channel] = cv::Mat(out_height, out_width, CV_32FC1, cv::Scalar(0));
     }
 
-    hls::stream<packet_type> s_in;
-    hls::stream<packet_type> s_out;
+    hls::stream<in_packet_type> s_in;
+    hls::stream<out_packet_type> s_out;
 
     for (int in_channel = 0; in_channel < in_channels; in_channel++)
     {
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
         {
             for (int x = 0; x < in_width; x++)
             {
-                packet_type in_packet;
+                in_packet_type in_packet;
 
                 in_packet.data = float(inMat.at<uchar>(y, x));
                 in_packet.last = false;
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    TOP_NAME(s_in, s_out);
+    test(s_in, s_out);
 
     for (int out_channel = 0; out_channel < out_channels; out_channel++)
     {
@@ -63,9 +63,9 @@ int main(int argc, char *argv[])
         {
             for (int x = 0; x < out_width; x++)
             {
-                packet_type out_packet;
+                out_packet_type out_packet;
                 s_out.read(out_packet);
-                float data = out_packet.data;
+                float data = float(out_packet.data);
 
                 outMat[out_channel].at<float>(y, x) = data;
                 diffMat[out_channel].at<float>(y, x) = fabs(data - float(inMat.at<uchar>(y + 1 - padding, x + 1 - padding)));
@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
 
     for (int out_channel = 0; out_channel < out_channels; out_channel++)
     {
-        std::string filtered_file_name = output_folder + "/conv2D_3x3_IM_filtered_" + std::to_string(out_channel) + ".png";
-        std::string diff_file_name = output_folder + "/conv2D_3x3_IM_diff_" + std::to_string(out_channel) + ".png";
+        std::string filtered_file_name = output_folder + "/Conv2d3x3_filtered_" + std::to_string(out_channel) + ".png";
+        std::string diff_file_name = output_folder + "/Conv2d3x3_diff_" + std::to_string(out_channel) + ".png";
 
         cv::imwrite(filtered_file_name, outMat[out_channel]);
         cv::imwrite(diff_file_name, diffMat[out_channel]);

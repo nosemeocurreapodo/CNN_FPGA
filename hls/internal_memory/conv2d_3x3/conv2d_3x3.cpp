@@ -1,10 +1,10 @@
 #include "hls_stream.h"
 
-#include "conv2d_3x3_base.h"
 #include "conv2d_3x3_params.h"
+#include "conv2d_3x3_base.h"
 #include "conv2d_3x3_weights.h"
 
-int TOP_NAME(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output)
+int test(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output)
 {
 
 #pragma HLS INTERFACE axis port = input
@@ -12,7 +12,7 @@ int TOP_NAME(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &o
 #pragma HLS INTERFACE s_axilite port = return
 
     // data_type weights[in_channels * out_channels * 3 * 3];
-    linalg::Mat3<w_data_type> weights[in_channels][out_channels];
+    linalgHLS::Mat3<w_data_type> weights[in_channels][out_channels];
 #pragma HLS ARRAY_PARTITION variable = weights complete dim = 0
 
     Conv2d3x3Weights(weights);

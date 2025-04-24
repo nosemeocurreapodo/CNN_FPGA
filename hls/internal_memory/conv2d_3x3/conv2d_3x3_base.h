@@ -2,11 +2,11 @@
 
 #include "ap_axi_sdata.h"
 #include "hls_stream.h"
-#include "linalg.h"
 #include "shift_registers.h"
+#include "linalgHLS.h"
 
 template <typename w_data_type, typename in_data_type, typename out_data_type, typename in_packet_type, typename out_packet_type, bool use_relu, int batch_size, int in_channels, int out_channels, int in_height, int in_width, int padding>
-int Conv2d3x3Base(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output, const linalg::Mat3<w_data_type> kernel[in_channels][out_channels])
+int Conv2d3x3Base(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output, const linalgHLS::Mat3<w_data_type> kernel[in_channels][out_channels])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output
@@ -46,7 +46,7 @@ batch_size_loop:
                     //     last_was_read = true;
 
                     shift_reg.ShiftDown(in_data);
-                    linalg::Mat3<in_data_type> data = shift_reg.GetMat();
+                    linalgHLS::Mat3<in_data_type> data = shift_reg.GetMat();
 
                 main_out_channel_loop:
                     for (int out_channel = 0; out_channel < out_channels; out_channel++)
