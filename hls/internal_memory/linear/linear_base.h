@@ -1,8 +1,5 @@
 #pragma once
 
-#include "ap_axi_sdata.h"
-#include "hls_stream.h"
-
 template <typename w_data_type, typename b_data_type, typename in_data_type, typename out_data_type, typename in_packet_type, typename out_packet_type, bool use_relu, int in_size, int out_size>
 int LinearBase(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output, const w_data_type weights[in_size][out_size], const b_data_type bias[out_size])
 {

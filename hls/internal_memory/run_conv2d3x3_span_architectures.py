@@ -1,7 +1,38 @@
 import vitis
 import os
 
-from params import data_type_list, batch_size_list, conv_param_list, clock_list, part_list, data_type_dict
+from data_type_dict import data_type_dict
+
+data_type_list = ["ap_fixed<2,1>",
+                  "ap_fixed<4,2>",
+                  "ap_fixed<8,4>"]
+batch_size_list = [1]
+conv_param_list = [{"in_channels": 1, "out_channels": 32,
+                    "in_height": 32, "in_width": 32,
+                    "padding": 1,
+                    "use_relu": 1},
+                   {"in_channels": 32, "out_channels": 32,
+                    "in_height": 32, "in_width": 32,
+                    "padding": 1,
+                    "use_relu": 1},
+                   {"in_channels": 32, "out_channels": 64,
+                    "in_height": 16, "in_width": 16,
+                    "padding": 1,
+                    "use_relu": 1},
+                   {"in_channels": 64, "out_channels": 64,
+                    "in_height": 16, "in_width": 16,
+                    "padding": 1,
+                    "use_relu": 1},
+                   {"in_channels": 64, "out_channels": 128,
+                    "in_height": 8, "in_width": 8,
+                    "padding": 1,
+                    "use_relu": 1},
+                   {"in_channels": 128, "out_channels": 128,
+                    "in_height": 8, "in_width": 8,
+                    "padding": 1,
+                    "use_relu": 1}]
+clock_list = ["10"]
+part_list = ['xc7z020clg400-1']
 
 cwd = os.getcwd()+'/'
 workspace_path = cwd + "/vitis_workspace/"
@@ -27,15 +58,15 @@ for part in part_list:
                             in_height = conv_param["in_height"]
                             in_width = conv_param["in_width"]
                             padding = conv_param["padding"]
-                            use_relu = 1
+                            use_relu = conv_param["use_relu"]
 
-                            component_name = (f"Conv2D3x3_period_{clock}_"
-                                            f"W{w_data_type}_"
-                                            f"IN{in_data_type}_"
-                                            f"OUT{out_data_type}_"
-                                            f"batch_size_{batch_size}_"
-                                            f"shape_{in_channels}x{out_channels}x{in_height}x{in_width}_"
-                                            f"padding_{padding}")
+                            component_name = (f"Conv2D3x3_p{clock}_"
+                                              f"W{w_data_type}_"
+                                              f"I{in_data_type}_"
+                                              f"O{out_data_type}_"
+                                              f"BATCH{batch_size}_"
+                                              f"{in_channels}x{out_channels}x{in_height}x{in_width}_"
+                                              f"PAD{padding}")
 
                             component_path = workspace_path + component_name + "/"
 

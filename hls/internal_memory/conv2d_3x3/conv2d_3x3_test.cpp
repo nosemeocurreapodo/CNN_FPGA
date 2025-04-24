@@ -5,8 +5,8 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "conv2d_3x3.h"
 #include "conv2d_3x3_params.h"
+#include "conv2d_3x3.h"
 
 int main(int argc, char *argv[])
 {
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    test(s_in, s_out);
+    Conv2d3x3(s_in, s_out);
 
     for (int out_channel = 0; out_channel < out_channels; out_channel++)
     {

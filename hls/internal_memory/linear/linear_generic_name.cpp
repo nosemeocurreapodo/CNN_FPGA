@@ -1,10 +1,11 @@
 #include "hls_stream.h"
 
-#include "linear_base.h"
+#include "../data_types_dict.h"
 #include "linear_params.h"
+#include "linear_base.h"
 #include "linear_weights_bias.h"
 
-int Linear(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output)
+int TOP_NAME(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output)
 {
 
 #pragma HLS INTERFACE axis port = input

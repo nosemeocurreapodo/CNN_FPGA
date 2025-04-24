@@ -1,7 +1,6 @@
 #pragma once
 
 #include "conv2d_3x3_params.h"
-#include "linalgHLS.h"
 
 const w_data_type kernel_identity[3 * 3] = {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
 const w_data_type kernel_sobel_py[3 * 3] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};

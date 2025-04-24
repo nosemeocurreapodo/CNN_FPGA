@@ -1,4 +1,4 @@
 #include "hls_stream.h"
 #include "linear_base.h"
 
-extern int TOP_NAME(hls::stream<packet_type> &input, hls::stream<packet_type> &output);
+extern int Linear(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output);

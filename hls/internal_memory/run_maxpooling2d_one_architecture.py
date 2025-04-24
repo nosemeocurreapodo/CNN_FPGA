@@ -1,41 +1,17 @@
 import vitis
 import os
 
-from params import data_type_dict
+from data_type_dict import data_type_dict
 
 part = 'xc7z020clg400-1'
 clock = "10"
 batch_size = 1
-layers_list = [{"w_data_type": "ap_fixed<4,2>",
-                "b_data_type": "ap_fixed<8,4>",
-                "in_data_type": "ap_fixed<8,4>",
+layers_list = [{"in_data_type": "ap_fixed<8,4>",
                 "out_data_type": "ap_fixed<8,4>",
-                "in_size": 1, "out_size": 32},
-               {"w_data_type": "ap_fixed<4,2>",
-                "b_data_type": "ap_fixed<8,4>",
-                "in_data_type": "ap_fixed<8,4>",
+                "in_channels": 1, "in_height": 32, "in_width": 32},
+               {"in_data_type": "ap_fixed<8,4>",
                 "out_data_type": "ap_fixed<8,4>",
-                "in_size": 32, "out_size": 32},
-               {"w_data_type": "ap_fixed<4,2>",
-                "b_data_type": "ap_fixed<8,4>",
-                "in_data_type": "ap_fixed<8,4>",
-                "out_data_type": "ap_fixed<8,4>",
-                "in_size": 32, "out_size": 64},
-               {"w_data_type": "ap_fixed<4,2>",
-                "b_data_type": "ap_fixed<8,4>",
-                "in_data_type": "ap_fixed<8,4>",
-                "out_data_type": "ap_fixed<8,4>",
-                "in_size": 64, "out_size": 64},
-               {"w_data_type": "ap_fixed<8,4>",
-                "b_data_type": "ap_fixed<8,4>",
-                "in_data_type": "ap_fixed<8,4>",
-                "out_data_type": "ap_fixed<8,4>",
-                "in_size": 64, "out_size": 128},
-               {"w_data_type": "ap_fixed<2,1>",
-                "b_data_type": "ap_fixed<8,4>",
-                "in_data_type": "ap_fixed<8,4>",
-                "out_data_type": "ap_fixed<8,4>",
-                "in_size": 128, "out_size": 128}]
+                "in_channels": 32, "in_height": 32, "in_width": 32}]
 
 cwd = os.getcwd()+'/'
 workspace_path = cwd + "/vitis_workspace/"
@@ -46,27 +22,21 @@ client.set_workspace(path=workspace_path)
 
 for layer in layers_list:
 
-    w_data_type_name = layer["w_data_type"]
-    b_data_type_name = layer["b_data_type"]
     in_data_type_name = layer["in_data_type"]
     out_data_type_name = layer["out_data_type"]
-    in_size = layer["in_size"]
-    out_size = layer["out_size"]
-    use_relu = 1
+    in_channels = layer["in_channels"]
+    in_height = layer["in_height"]
+    in_width = layer["in_width"]
 
-    w_data_type = data_type_dict[w_data_type_name]
-    b_data_type = data_type_dict[b_data_type_name]
     in_data_type = data_type_dict[in_data_type_name]
     out_data_type = data_type_dict[out_data_type_name]
-        
-    component_name = (f"Linear_"
-                      f"period_{clock}_"
-                      f"W{w_data_type}_"
-                      f"B{b_data_type}_"
-                      f"IN{in_data_type}_"
-                      f"OUT{out_data_type}_"
-                      f"batch_size_{batch_size}_"
-                      f"shape_{in_size}x{out_size}_")
+
+    component_name = (f"MaxPooling2d_"
+                      f"p{clock}_"
+                      f"I{in_data_type}_"
+                      f"O{out_data_type}_"
+                      f"BATCH{batch_size}_"
+                      f"{in_channels}x{in_height}x{in_width}")
 
     component_path = workspace_path + component_name + "/"
 
@@ -86,35 +56,30 @@ for layer in layers_list:
     cfg_file = client.get_config_file(path=component_path + "hls_config.cfg")
     cfg_file.set_value(key='part', value=part) 
     cfg_file.set_values(section='hls', key='syn.file',
-                        values=[cwd+'linear.cpp',
-                                cwd+'linear.h',
-                                cwd+'linear_base.h',
-                                cwd+'linear_params.h',
-                                cwd+'linear_weights_bias.h'])
+                        values=[cwd+'maxpooling2d/maxpooling2d_generic_name.cpp',
+                                cwd+'maxpooling2d/maxpooling2d_base.h',
+                                cwd+'maxpooling2d/maxpooling2d_params.h'])
     cfg_file.set_value(section='hls', key='syn.file_cflags',
-                       value=cwd+(f"linear.cpp, "
+                       value=(cwd+f"maxpooling2d/maxpooling2d_generic_name.cpp, "
                                   f"-DTOP_NAME={component_name} "
-                                  f"-DUSE_RELU={use_relu} "
-                                  f"-DW_DATA_TYPE={w_data_type} "
-                                  f"-DB_DATA_TYPE={b_data_type} "
                                   f"-DIN_DATA_TYPE={in_data_type} "
                                   f"-DOUT_DATA_TYPE={out_data_type} "
                                   f"-DBATCH_SIZE={batch_size} "
-                                  f"-DIN_SIZE={in_size} "
-                                  f"-DOUT_SIZE={out_size} "))
+                                  f"-DIN_CHANNELS={in_channels} "
+                                  f"-DIN_HEIGHT={in_height} "
+                                  f"-DIN_WIDTH={in_width} "
+                                  f"-I{cwd}../../HLSLinearAlgebra/src "))
     cfg_file.set_values(section='hls', key='tb.file',
-                        values=[cwd+'conv2D_3x3_IM_test.cpp'])
+                        values=[cwd+'maxpooling2d/maxpooling2d_test.cpp'])
     cfg_file.set_value(section='hls', key='tb.file_cflags',
-                       value=cwd+(f"conv2D_3x3_IM_test.cpp, "
-                                  f"-DTOP_NAME={component_name} "
-                                  f"-DUSE_RELU={use_relu} "
-                                  f"-DW_DATA_TYPE={w_data_type} "
-                                  f"-DB_DATA_TYPE={b_data_type} "
+                       value=(cwd+f"maxpooling2d/maxpooling2d_test.cpp, "
                                   f"-DIN_DATA_TYPE={in_data_type} "
                                   f"-DOUT_DATA_TYPE={out_data_type} "
                                   f"-DBATCH_SIZE={batch_size} "
-                                  f"-DIN_SIZE={in_size} "
-                                  f"-DOUT_SIZE={out_size} "
+                                  f"-DIN_CHANNELS={in_channels} "
+                                  f"-DIN_HEIGHT={in_height} "
+                                  f"-DIN_WIDTH={in_width} "
+                                  f"-I{cwd}../../HLSLinearAlgebra/src "
                                   "-I/usr/include/opencv4 "
                                   "-lopencv_core "
                                   "-lopencv_highgui "

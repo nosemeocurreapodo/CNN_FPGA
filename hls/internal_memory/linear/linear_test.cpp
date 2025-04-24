@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    TOP_NAME(s_in, s_out);
+    Linear(s_in, s_out);
 
     for (int out_channel = 0; out_channel < out_channels; out_channel++)
     {

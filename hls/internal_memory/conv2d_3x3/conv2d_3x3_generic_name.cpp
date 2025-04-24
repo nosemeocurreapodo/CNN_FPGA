@@ -1,10 +1,11 @@
 #include "hls_stream.h"
 
+#include "../data_types_dict.h"
 #include "conv2d_3x3_params.h"
 #include "conv2d_3x3_base.h"
 #include "conv2d_3x3_weights.h"
 
-int Conv2d3x3(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output)
+int TOP_NAME(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output)
 {
 
 #pragma HLS INTERFACE axis port = input

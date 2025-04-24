@@ -1,7 +1,19 @@
 import vitis
 import os
 
-from params import data_type_list, batch_size_list, linear_param_list, clock_list, part_list, data_type_dict
+from hls.internal_memory import data_type_dict
+
+data_type_list = ["ap_fixed<2,1>",
+                  "ap_fixed<4,2>",
+                  "ap_fixed<8,4>"]
+batch_size_list = [1]
+linear_param_list = [{"in_size": 2, "out_size": 2},
+                     {"in_size": 4, "out_size": 4},
+                     {"in_size": 8, "out_size": 8},
+                     {"in_size": 16, "out_size": 16},
+                     {"in_size": 32, "out_size": 32},]
+clock_list = ["10"]
+part_list = ['xc7z020clg400-1']
 
 cwd = os.getcwd()+'/'
 workspace_path = cwd + "/vitis_workspace/"

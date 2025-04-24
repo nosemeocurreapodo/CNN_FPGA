@@ -1,35 +1,25 @@
 import vitis
 import os
 
-from params import data_type_dict
+from data_type_dict import data_type_dict
 
 part = 'xc7z020clg400-1'
 clock = "10"
-batch_size = 32
-layers_list = [{"dtype": "ap_fixed<4,2>",
+batch_size = 1
+layers_list = [{"w_data_type": "ap_fixed<4,2>",
+                "in_data_type": "ap_fixed<8,4>",
+                "out_data_type": "ap_fixed<8,4>",
                 "in_channels": 1, "out_channels": 32,
                 "in_height": 32, "in_width": 32,
-                "padding": 1},
-               {"dtype": "ap_fixed<4,2>",
+                "padding": 1,
+                "use_relu": 1},
+               {"w_data_type": "ap_fixed<4,2>",
+                "in_data_type": "ap_fixed<8,4>",
+                "out_data_type": "ap_fixed<8,4>",
                 "in_channels": 32, "out_channels": 32,
                 "in_height": 32, "in_width": 32,
-                "padding": 1},
-               {"dtype": "ap_fixed<4,2>",
-                "in_channels": 32, "out_channels": 64,
-                "in_height": 16, "in_width": 16,
-                "padding": 1},
-               {"dtype": "ap_fixed<4,2>",
-                "in_channels": 64, "out_channels": 64,
-                "in_height": 16, "in_width": 16,
-                "padding": 1},
-               {"dtype": "ap_fixed<2,1>",
-                "in_channels": 64, "out_channels": 128,
-                "in_height": 8, "in_width": 8,
-                "padding": 1},
-               {"dtype": "ap_fixed<4,2>",
-                "in_channels": 128, "out_channels": 128,
-                "in_height": 8, "in_width": 8,
-                "padding": 1}]
+                "padding": 1,
+                "use_relu": 1},]
 
 cwd = os.getcwd()+'/'
 workspace_path = cwd + "/vitis_workspace/"
@@ -40,20 +30,29 @@ client.set_workspace(path=workspace_path)
 
 for layer in layers_list:
 
-    data_type_name = layer["dtype"]
+    w_data_type_name = layer["w_data_type"]
+    in_data_type_name = layer["in_data_type"]
+    out_data_type_name = layer["out_data_type"]
     in_channels = layer["in_channels"]
     out_channels = layer["out_channels"]
     in_height = layer["in_height"]
     in_width = layer["in_width"]
     padding = layer["padding"]
-    use_relu = 1
+    use_relu = layer["use_relu"]
 
-    data_type = data_type_dict[data_type_name]
+    w_data_type = data_type_dict[w_data_type_name]
+    in_data_type = data_type_dict[in_data_type_name]
+    out_data_type = data_type_dict[out_data_type_name]
 
-    component_name = (f"conv2D_3x3_IM_period_{clock}_"
-                      f"dtype_{data_type}_"
-                      f"shape_{in_channels}x{out_channels}x{in_height}x{in_width}_"
-                      f"padding_{padding}")
+    component_name = (f"Conv2d3x3_"
+                      f"p{clock}_"
+                      f"W{w_data_type}_"
+                      f"I{in_data_type}_"
+                      f"O{out_data_type}_"
+                      f"BATCH{batch_size}_"
+                      f"{in_channels}x{out_channels}x{in_height}x{in_width}_"
+                      f"PAD{padding}_"
+                      f"RELU{use_relu}")
 
     component_path = workspace_path + component_name + "/"
 
@@ -73,33 +72,41 @@ for layer in layers_list:
     cfg_file = client.get_config_file(path=component_path + "hls_config.cfg")
     cfg_file.set_value(key='part', value=part) 
     cfg_file.set_values(section='hls', key='syn.file',
-                        values=[cwd+'conv2D_3x3_IM.cpp',
-                                cwd+'conv2D_3x3_IM.h',
-                                cwd+'conv2D_3x3_IM_base.h',
-                                cwd+'conv2D_3x3_IM_params.h',
-                                cwd+'conv2D_3x3_IM_weights.h'])
+                        values=[cwd+'conv2d_3x3/conv2d_3x3_generic_name.cpp',
+                                cwd+'conv2d_3x3/conv2d_3x3_base.h',
+                                cwd+'conv2d_3x3/conv2d_3x3_params.h',
+                                cwd+'conv2d_3x3/conv2d_3x3_weights.h'])
     cfg_file.set_value(section='hls', key='syn.file_cflags',
-                       value=cwd+(f"conv2D_3x3_IM.cpp, "
+                       value=(cwd+f"conv2d_3x3/conv2d_3x3_generic_name.cpp, "
                                   f"-DTOP_NAME={component_name} "
                                   f"-DUSE_RELU={use_relu} "
-                                  f"-DDATA_TYPE={data_type} "
-                                  f"-DIN_CHANNELS={in_channels} "
-                                  f"-DOUT_CHANNELS={out_channels} "
-                                  f"-DIN_HEIGHT={in_height} "
-                                  f"-DIN_WIDTH={in_width} "
-                                  f"-DPADDING={padding}"))
-    cfg_file.set_values(section='hls', key='tb.file',
-                        values=[cwd+'conv2D_3x3_IM_test.cpp'])
-    cfg_file.set_value(section='hls', key='tb.file_cflags',
-                       value=cwd+(f"conv2D_3x3_IM_test.cpp, "
-                                  f"-DTOP_NAME={component_name} "
-                                  f"-DUSE_RELU={use_relu} "
-                                  f"-DDATA_TYPE={data_type} "
+                                  f"-DW_DATA_TYPE={w_data_type} "
+                                  f"-DB_DATA_TYPE={w_data_type} "
+                                  f"-DIN_DATA_TYPE={in_data_type} "
+                                  f"-DOUT_DATA_TYPE={out_data_type} "
+                                  f"-DBATCH_SIZE={batch_size} "
                                   f"-DIN_CHANNELS={in_channels} "
                                   f"-DOUT_CHANNELS={out_channels} "
                                   f"-DIN_HEIGHT={in_height} "
                                   f"-DIN_WIDTH={in_width} "
                                   f"-DPADDING={padding} "
+                                  f"-I{cwd}../../HLSLinearAlgebra/src"))
+    cfg_file.set_values(section='hls', key='tb.file',
+                        values=[cwd+'conv2d_3x3/conv2d_3x3_test.cpp'])
+    cfg_file.set_value(section='hls', key='tb.file_cflags',
+                       value=(cwd+f"conv2d_3x3/conv2d_3x3_test.cpp, "
+                                  f"-DUSE_RELU={use_relu} "
+                                  f"-DW_DATA_TYPE={w_data_type} "
+                                  f"-DB_DATA_TYPE={w_data_type} "
+                                  f"-DIN_DATA_TYPE={in_data_type} "
+                                  f"-DOUT_DATA_TYPE={out_data_type} "
+                                  f"-DBATCH_SIZE={batch_size} "
+                                  f"-DIN_CHANNELS={in_channels} "
+                                  f"-DOUT_CHANNELS={out_channels} "
+                                  f"-DIN_HEIGHT={in_height} "
+                                  f"-DIN_WIDTH={in_width} "
+                                  f"-DPADDING={padding} "
+                                  f"-I{cwd}../../HLSLinearAlgebra/src "
                                   "-I/usr/include/opencv4 "
                                   "-lopencv_core "
                                   "-lopencv_highgui "
@@ -138,3 +145,4 @@ for layer in layers_list:
     # comp.run(operation='C_SIMULATION')
     comp.run(operation='SYNTHESIS')
     # comp.run(operation='CO_SIMULATION')
+    comp.run(operation='IMPLEMENTATION')
