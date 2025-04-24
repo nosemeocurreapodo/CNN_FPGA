@@ -17,7 +17,7 @@ int TOP_NAME(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &o
 
     Conv2d3x3Weights(weights);
 
-    return Conv2D3x3IMBase<w_data_type,
+    return Conv2d3x3Base<w_data_type,
                            in_data_type,
                            out_data_type,
                            in_packet_type,

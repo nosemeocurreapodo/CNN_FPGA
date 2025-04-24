@@ -6,7 +6,7 @@
 #include "shift_registers.h"
 
 template <typename w_data_type, typename in_data_type, typename out_data_type, typename in_packet_type, typename out_packet_type, bool use_relu, int batch_size, int in_channels, int out_channels, int in_height, int in_width, int padding>
-int Conv2D3x3IMBase(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output, const linalg::Mat3<w_data_type> kernel[in_channels][out_channels])
+int Conv2d3x3Base(hls::stream<in_packet_type> &input, hls::stream<out_packet_type> &output, const linalg::Mat3<w_data_type> kernel[in_channels][out_channels])
 {
 #pragma HLS INTERFACE axis port = input
 #pragma HLS INTERFACE axis port = output

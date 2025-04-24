@@ -66,14 +66,14 @@ for layer in layers_list:
     in_data_type = data_type_dict[in_data_type_name]
     out_data_type = data_type_dict[out_data_type_name]
 
-    component_name = (f"conv2D_3x3_"
-                      f"period_{clock}_"
+    component_name = (f"Conv2d3x3_"
+                      f"p{clock}_"
                       f"W{w_data_type}_"
-                      f"IN{in_data_type}_"
-                      f"OUT{out_data_type}_"
-                      f"batch_size_{batch_size}_"
-                      f"shape_{in_channels}x{out_channels}x{in_height}x{in_width}_"
-                      f"padding_{padding}")
+                      f"I{in_data_type}_"
+                      f"O{out_data_type}_"
+                      f"BATCH{batch_size}_"
+                      f"{in_channels}x{out_channels}x{in_height}x{in_width}_"
+                      f"PAD{padding}")
 
     component_path = workspace_path + component_name + "/"
 
@@ -112,7 +112,6 @@ for layer in layers_list:
                                   f"-DIN_HEIGHT={in_height} "
                                   f"-DIN_WIDTH={in_width} "
                                   f"-DPADDING={padding} "
-                                  # "-std=c++17 "
                                   f"-I{cwd}../../common "
                                   f"-I{cwd}../../../HLSLinearAlgebra/src"))
     cfg_file.set_values(section='hls', key='tb.file',
@@ -131,9 +130,8 @@ for layer in layers_list:
                                   f"-DIN_HEIGHT={in_height} "
                                   f"-DIN_WIDTH={in_width} "
                                   f"-DPADDING={padding} "
-                                  # "-std=c++17 "
-                                  "-I../../../common "
-                                  "-I../../../HLSLinearAlgebra/src "
+                                  "-I{cwd}../../common "
+                                  "-I{cwd}../../../HLSLinearAlgebra/src "
                                   "-I/usr/include/opencv4 "
                                   "-lopencv_core "
                                   "-lopencv_highgui "
