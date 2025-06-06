@@ -29,11 +29,11 @@ using w_data_type = float; // Use float for -1
 #elif W_DATA_TYPE == 8
 using w_data_type = double; // Use double for -2
 #elif W_DATA_TYPE == 9
-using w_data_type = ap_float<8, 4>; // Use ap_float for -3
+using w_data_type = ap_float<8, 3>; // Use ap_float for -3
 #elif W_DATA_TYPE == 10
-using w_data_type = ap_float<16, 8>; // Use ap_float for -4
+using w_data_type = ap_float<16, 5>; // Use ap_float for -4
 #elif W_DATA_TYPE == 11
-using w_data_type = ap_float<32, 16>; // Use ap_float for -5
+using w_data_type = ap_float<32, 8>; // Use ap_float for -5
 #elif W_DATA_TYPE == 12
 using w_data_type = Posit<8, 1>; // Use Posit for -6
 #elif W_DATA_TYPE == 13
@@ -65,11 +65,11 @@ using b_data_type = float; // Use float for -1
 #elif B_DATA_TYPE == 8
 using b_data_type = double; // Use double for -2
 #elif B_DATA_TYPE == 9
-using b_data_type = ap_float<8, 4>; // Use ap_float for -3
+using b_data_type = ap_float<8, 3>; // Use ap_float for -3
 #elif B_DATA_TYPE == 10
-using b_data_type = ap_float<16, 8>; // Use ap_float for -4
+using b_data_type = ap_float<16, 5>; // Use ap_float for -4
 #elif B_DATA_TYPE == 11
-using b_data_type = ap_float<32, 16>; // Use ap_float for -5
+using b_data_type = ap_float<32, 8>; // Use ap_float for -5
 #elif B_DATA_TYPE == 12
 using b_data_type = Posit<8, 1>; // Use Posit for -6
 #elif B_DATA_TYPE == 13
@@ -101,11 +101,11 @@ using in_data_type = float; // Use float for -1
 #elif IN_DATA_TYPE == 8
 using in_data_type = double; // Use double for -2
 #elif IN_DATA_TYPE == 9
-using in_data_type = ap_float<8, 4>; // Use ap_float for -3
+using in_data_type = ap_float<8, 3>; // Use ap_float for -3
 #elif IN_DATA_TYPE == 10
-using in_data_type = ap_float<16, 8>; // Use ap_float for -4
+using in_data_type = ap_float<16, 5>; // Use ap_float for -4
 #elif IN_DATA_TYPE == 11
-using in_data_type = ap_float<32, 16>; // Use ap_float for -5
+using in_data_type = ap_float<32, 8>; // Use ap_float for -5
 #elif IN_DATA_TYPE == 12
 using in_data_type = Posit<8, 1>; // Use Posit for -6
 #elif IN_DATA_TYPE == 13
@@ -137,11 +137,11 @@ using out_data_type = float; // Use float for -1
 #elif OUT_DATA_TYPE == 8
 using out_data_type = double; // Use double for -2
 #elif OUT_DATA_TYPE == 9
-using out_data_type = ap_float<8, 4>; // Use ap_float for -3
+using out_data_type = ap_float<8, 3>; // Use ap_float for -3
 #elif OUT_DATA_TYPE == 10
-using out_data_type = ap_float<16, 8>; // Use ap_float for -4
+using out_data_type = ap_float<16, 5>; // Use ap_float for -4
 #elif OUT_DATA_TYPE == 11
-using out_data_type = ap_float<32, 16>; // Use ap_float for -5
+using out_data_type = ap_float<32, 8>; // Use ap_float for -5
 #elif OUT_DATA_TYPE == 12
 using out_data_type = Posit<8, 1>; // Use Posit for -6
 #elif OUT_DATA_TYPE == 13

@@ -25,12 +25,13 @@ for part in part_list:
                             padding = conv_param["padding"]
                             use_relu = 1
 
-                            component_name = (f"conv2D_3x3_IM_period_{clock}_"
+                            component_name = (f"conv2d3x3_p{clock}_"
                                             f"W{w_data_type}_"
                                             f"A{a_data_type}_"
-                                            f"batch_size_{batch_size}_"
-                                            f"shape_{in_channels}x{out_channels}x{in_height}x{in_width}_"
-                                            f"padding_{padding}")
+                                            f"BATCH{batch_size}_"
+                                            f"{in_channels}x{out_channels}x{in_height}x{in_width}_"
+                                            f"PAD{padding}_"
+                                            f"RELU{use_relu}")
 
                             component_path = workspace_path + component_name + "/"
 
