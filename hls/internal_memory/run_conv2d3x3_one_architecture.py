@@ -6,16 +6,16 @@ from data_type_dict import data_type_dict
 part = 'xc7z020clg400-1'
 clock = "10"
 batch_size = 1
-layers_list = [{"w_data_type": "ap_fixed<4,2>",
-                "in_data_type": "ap_fixed<8,4>",
-                "out_data_type": "ap_fixed<8,4>",
+layers_list = [{"w_data_type": "Posit<16,2>",
+                "in_data_type": "Posit<16,2>",
+                "out_data_type": "Posit<16,2>",
                 "in_channels": 1, "out_channels": 32,
                 "in_height": 32, "in_width": 32,
                 "padding": 1,
                 "use_relu": 1},
-               {"w_data_type": "ap_fixed<4,2>",
-                "in_data_type": "ap_fixed<8,4>",
-                "out_data_type": "ap_fixed<8,4>",
+               {"w_data_type": "Posit<16,2>",
+                "in_data_type": "Posit<16,2>",
+                "out_data_type": "Posit<16,2>",
                 "in_channels": 32, "out_channels": 32,
                 "in_height": 32, "in_width": 32,
                 "padding": 1,

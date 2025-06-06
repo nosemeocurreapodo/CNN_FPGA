@@ -1,4 +1,14 @@
 data_type_dict = {"ap_fixed<1,1>": 1,
                   "ap_fixed<2,1>": 2,
-                  "ap_fixed<4,2>": 4,
-                  "ap_fixed<8,4>": 8}
+                  "ap_fixed<4,2>": 3,
+                  "ap_fixed<8,4>": 4,
+                  "ap_fixed<16,8>": 5,
+                  "ap_fixed<32,16>": 6,
+                  "float": 7,
+                  "double": 8,
+                  "ap_float<8,4>": 9,
+                  "ap_float<16,8>": 10,
+                  "ap_float<32,16>": 1,
+                  "Posit<8,1>": 12,
+                  "Posit<16,2>": 13,
+                  "Posit<32,3>": 14}

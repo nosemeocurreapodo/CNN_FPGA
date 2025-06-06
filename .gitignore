@@ -1,5 +1,6 @@
 /data
 /hls/results
+/hls/internal_memory/vitis_workspace
 /python/hwdnas/data
 /vitis_workspace
 /vivado_workspace
